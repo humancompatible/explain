@@ -10,20 +10,7 @@ setup(
     description='AutoFair Explainability Toolkit',
     packages=find_packages(include=['humancompatible', 'humancompatible.*']),
     install_requires=[],  # No base install
-    extras_require={
-        'facts': read_requirements('requirements_facts.txt'),
-        'glance': read_requirements('requirements_glance.txt'),
-        'all': list(set(
-            read_requirements('requirements_facts.txt') +
-            read_requirements('requirements_glance.txt')
-        )),
-    },
-    entry_points={
-        'console_scripts': [
-            'explain-facts=humancompatible.explain.facts.main:main',
-            'explain-glance=humancompatible.explain.glance.main:main'
-        ],
-    },
+    install_requires=read_requirements('requirements.txt'),
     include_package_data=True,
     zip_safe=False,
 )
