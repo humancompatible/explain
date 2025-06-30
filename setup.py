@@ -9,7 +9,6 @@ setup(
     version='0.1.0',
     description='AutoFair Explainability Toolkit',
     packages=find_packages(include=['humancompatible', 'humancompatible.*']),
-    install_requires=[],  # No base install
     install_requires=read_requirements('requirements.txt'),
     include_package_data=True,
     zip_safe=False,
