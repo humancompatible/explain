@@ -34,7 +34,7 @@ cd explain
 ### 2. Create and activate a virtual enviroment
 **Using Conda**:<br><br>
 ```bash
-conda create --name explain python=3.10.24
+conda create --name explain python=3.10.4
 conda activate explain
 ```
 <br>
