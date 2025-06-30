@@ -33,34 +33,21 @@ cd explain
 
 ### 2. Create and activate a virtual enviroment
 **Using Conda**:<br><br>
-**For FACTS**:
 ```bash
-conda create --name facts python=3.9.16
-conda activate facts
+conda create --name explain python=3.10.24
+conda activate explain
 ```
 <br>
 
-**For GLANCE**:
-```bash
-conda create --name glance python=3.10.4
-conda activate glance
-```
 **Using by using Python venv**:<br>
 ```bash
 python3 -m venv env
 source env/bin/activate
 ```
 ### 3. Install required dependencies
-**For FACTS**:
-
 
 ```bash
-pip install -r requirements_facts.txt
-```
-
-**For GLANCE**:
-```bash
-pip install -r requirements_glance.txt
+pip install -e .
 ```
 
 ### 4. (Optional) Jupyter setup for notebooks
