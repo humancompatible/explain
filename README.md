@@ -9,7 +9,7 @@ This repository contains two explainability methods developed for the **AutoFair
 
 ## Documentation
 
-Full API documentation is available at: **[🔗 Read the Docs (link here once deployed)]**
+Full API documentation is available at: **[https://humancompatible-explain.readthedocs.io/en/latest/glance.html](https://humancompatible-explain.readthedocs.io/en/latest/glance.html)]**
 
 ---
 
