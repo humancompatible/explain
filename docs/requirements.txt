@@ -1,0 +1,7 @@
+Sphinx
+sphinx-rtd-theme
+sphinx-autodoc-typehints
+# Your project's dependencies for autodoc to import successfully:
+numpy
+pandas
+myst-parser
