@@ -3,14 +3,4 @@ sphinx-rtd-theme>=3.0
 sphinx-autodoc-typehints>=3.0
 myst-parser>=0.18
 
-# Project runtime dependencies required for autodoc
-numpy
-pandas
-scikit-learn
-tqdm
-ipython
-dice-ml
 
-# Optional, but often useful
-matplotlib
-pyyaml
