@@ -1,16 +1,16 @@
-# Core Sphinx dependencies
-sphinx
-sphinx-rtd-theme
-sphinx-autodoc-typehints
-myst-parser
+sphinx>=8.0
+sphinx-rtd-theme>=3.0
+sphinx-autodoc-typehints>=3.0
+myst-parser>=0.18
 
-# Project dependencies needed for autodoc to work
+# Project runtime dependencies required for autodoc
 numpy
 pandas
-scikit-learn      # required by modules like clustering, facts, etc.
-tqdm              # used in iterative_merges, counterfactual_tree
-dice-ml           # required by local_cfs methods
-ipython           # used by utils and some tree modules
+scikit-learn
+tqdm
+ipython
+dice-ml
 
-# Optional but commonly useful
-matplotlib        # if your docstrings include plots or you use plots in examples
+# Optional, but often useful
+matplotlib
+pyyaml
