@@ -15,7 +15,7 @@ Full API documentation is available at: **[https://humancompatible-explain.readt
 
 ## Project Structure
 
-humancompatible/ folder contains the corresponding code for the implemented methods.
+The `humancompatible/explain/` folder contains the corresponding code for the implemented methods.
 
 
 ---
@@ -59,9 +59,9 @@ jupyter notebook
 ## Example notebooks
 Explore the functionality through example notebooks in the examples/ directory:
 
-- demo_FACTS.ipynb – Demonstrates FACTS usage and subgroup fairness evaluation with the UCI Adult dataset.
+- [demo_FACTS.ipynb](examples/facts/demo_FACTS.ipynb) – Demonstrates FACTS usage and subgroup fairness evaluation with the UCI Adult dataset.
+- [demo_GLANCE.ipynb](examples/glance/demo_GLANCE.ipynb) – Demonstrates GLANCE with the UCI Adult dataset.
 
-- demo_GLANCE.ipynb – Demonstrates GLANCE with the UCI Adult dataset.
 
 These notebooks offer adjustable parameters and serve as entry points for integrating your own models or datasets.
 
