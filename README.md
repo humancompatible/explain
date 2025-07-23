@@ -4,7 +4,8 @@ This repository contains two explainability methods developed for the **AutoFair
 
 - **FACTS**: *Fairness-Aware Counterfactuals for Subgroups* — a model-agnostic, highly parameterizable framework for auditing subgroup fairness through counterfactual explanations.
 - **GLANCE**: *Global Actions in a Nutshell for Counterfactual Explainability* — a versatile and adaptive framework for generating global counterfactual explanations.
-  
+- **LiCE**: *Likely Counterfactual Explanations* — a method of finding high-quality plausible counterfactual explanations.
+
 ---
 
 ## Documentation
@@ -61,7 +62,7 @@ Explore the functionality through example notebooks in the examples/ directory:
 
 - [demo_FACTS.ipynb](examples/facts/demo_FACTS.ipynb) – Demonstrates FACTS usage and subgroup fairness evaluation with the UCI Adult dataset.
 - [demo_GLANCE.ipynb](examples/glance/demo_GLANCE.ipynb) – Demonstrates GLANCE with the UCI Adult dataset.
-
+- [demo_LiCE.ipynb](examples/lice/demo_LiCE.ipynb) – Demonstrates LiCE with the [Give me some Credit](https://www.kaggle.com/c/GiveMeSomeCredit/data) dataset.
 
 These notebooks offer adjustable parameters and serve as entry points for integrating your own models or datasets.
 
