@@ -49,8 +49,6 @@ source env/bin/activate
 
 ```bash
 pip install -e .
-# to use LiCE, install SPFlow like this
-pip install git+https://github.com/SPFlow/SPFlow@d01f71d6618e95267609c1899d8e8e95d64965e5
 ```
 
 ### 4. (Optional) Jupyter setup for notebooks
