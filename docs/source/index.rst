@@ -13,6 +13,7 @@ Included Methods
 
 - **GLANCE**: A versatile and adaptive framework for generating global counterfactual explanations. These explanations are expressed as actions that offer recourse to large population subgroups. The framework aims to provide explanations and insights, ensuring that the actions benefit as many individuals as possible.
 - **FACTS**: An efficient, model-agnostic, highly parameterizable, and explainable framework for evaluating subgroup fairness through counterfactual explanations. FACTS facilitates in-depth analysis of fairness across different subgroups by simulating alternative decision outcomes.
+- **LiCE**: A method of finding high-quality Counterfactual Explanations. Utilizing a Sum-Product Network to estimate the plausibility (i.e., likelihood) of the counterfactual sample. We are able to find globally optimal (i.e., closest/most likely) counterfactuals, while satisfying various constraints on the data (actionability, data constraints, causal relations...).
 
 Explore the documentation below for details on the implementation, usage, and customization of these methods.
 
@@ -24,3 +25,4 @@ Explore the documentation below for details on the implementation, usage, and cu
 
    facts
    glance
+   lice
