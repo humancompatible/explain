@@ -4,6 +4,7 @@ This repository contains two explainability methods developed for the **AutoFair
 
 - **FACTS**: *Fairness-Aware Counterfactuals for Subgroups* — a model-agnostic, highly parameterizable framework for auditing subgroup fairness through counterfactual explanations.
 - **GLANCE**: *Global Actions in a Nutshell for Counterfactual Explainability* — a versatile and adaptive framework for generating global counterfactual explanations.
+- **FCX**: *Feasible Counterfactual Explanations* - a novel framework that generates realistic and low-cost counterfactuals by enforcing both hard feasibility constraints provided by domain experts and soft causal constraints inferred from data.
   
 ---
 
