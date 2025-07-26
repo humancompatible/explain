@@ -1,0 +1,674 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FCX Binary Constraint Training (Adult) &mdash; HumanCompatible.Explain  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="FCX BlackBox Model training (Adult)" href="blackbox_model_train.html" />
+    <link rel="prev" title="FCX Unary Constraint Training (Adult)" href="fcx_unary_generation_adult.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            HumanCompatible.Explain
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="facts.html">FACTS: Fairness Aware Counterfactual for Subgrouos package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glance.html">GLANCE: Global Actions in a Nutshell for Counterfactual Explainability</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="fcx.html">FCX: Finding Feasible Counterfactual Explanation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="fcx_unary_generation_adult.html">FCX Unary Constraint Training (Adult)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">FCX Binary Constraint Training (Adult)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#humancompatible.explain.fcx.FCX_binary_generation_adult.compute_loss"><code class="docutils literal notranslate"><span class="pre">compute_loss()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#humancompatible.explain.fcx.FCX_binary_generation_adult.train_binary_fcx_vae"><code class="docutils literal notranslate"><span class="pre">train_binary_fcx_vae()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#humancompatible.explain.fcx.FCX_binary_generation_adult.train_constraint_loss"><code class="docutils literal notranslate"><span class="pre">train_constraint_loss()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE"><code class="docutils literal notranslate"><span class="pre">FCX_VAE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.immutables"><code class="docutils literal notranslate"><span class="pre">FCX_VAE.immutables</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoded_size"><code class="docutils literal notranslate"><span class="pre">FCX_VAE.encoded_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.data_size"><code class="docutils literal notranslate"><span class="pre">FCX_VAE.data_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoded_categorical_feature_indexes"><code class="docutils literal notranslate"><span class="pre">FCX_VAE.encoded_categorical_feature_indexes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoded_continuous_feature_indexes"><code class="docutils literal notranslate"><span class="pre">FCX_VAE.encoded_continuous_feature_indexes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoded_start_cat"><code class="docutils literal notranslate"><span class="pre">FCX_VAE.encoded_start_cat</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoder_mean"><code class="docutils literal notranslate"><span class="pre">FCX_VAE.encoder_mean</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoder_var"><code class="docutils literal notranslate"><span class="pre">FCX_VAE.encoder_var</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.decoder_mean"><code class="docutils literal notranslate"><span class="pre">FCX_VAE.decoder_mean</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.compute_elbo"><code class="docutils literal notranslate"><span class="pre">FCX_VAE.compute_elbo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.decoder"><code class="docutils literal notranslate"><span class="pre">FCX_VAE.decoder()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoder"><code class="docutils literal notranslate"><span class="pre">FCX_VAE.encoder()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.forward"><code class="docutils literal notranslate"><span class="pre">FCX_VAE.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.normal_likelihood"><code class="docutils literal notranslate"><span class="pre">FCX_VAE.normal_likelihood()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.sample_latent_code"><code class="docutils literal notranslate"><span class="pre">FCX_VAE.sample_latent_code()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#humancompatible.explain.fcx.scripts.causal_modules.binarize_adj_matrix"><code class="docutils literal notranslate"><span class="pre">binarize_adj_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#humancompatible.explain.fcx.scripts.causal_modules.causal_regularization_enhanced"><code class="docutils literal notranslate"><span class="pre">causal_regularization_enhanced()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#humancompatible.explain.fcx.scripts.causal_modules.ensure_dag"><code class="docutils literal notranslate"><span class="pre">ensure_dag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#humancompatible.explain.fcx.LOFLoss.LOFLoss"><code class="docutils literal notranslate"><span class="pre">LOFLoss</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#humancompatible.explain.fcx.LOFLoss.LOFLoss.forward"><code class="docutils literal notranslate"><span class="pre">LOFLoss.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#humancompatible.explain.fcx.LOFLoss.LOFLoss.pairwise_distances"><code class="docutils literal notranslate"><span class="pre">LOFLoss.pairwise_distances()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#humancompatible.explain.fcx.scripts.datagen_func.prepare_datasets"><code class="docutils literal notranslate"><span class="pre">prepare_datasets()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="blackbox_model_train.html">FCX BlackBox Model training (Adult)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fcx_evaluate_unary_adult.html">FCX Unary Evaluation (Adult)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fcx_evaluate_binary_adult.html">FCX Binary Evaluation (Adult)</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">HumanCompatible.Explain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="fcx.html">FCX: Finding Feasible Counterfactual Explanation</a></li>
+      <li class="breadcrumb-item active">FCX Binary Constraint Training (Adult)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/fcx_binary_generation_adult.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="fcx-binary-constraint-training-adult">
+<h1>FCX Binary Constraint Training (Adult)<a class="headerlink" href="#fcx-binary-constraint-training-adult" title="Link to this heading"></a></h1>
+<hr class="docutils" />
+<dl class="py function" id="module-humancompatible.explain.fcx.FCX_binary_generation_adult">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.FCX_binary_generation_adult.compute_loss">
+<span class="sig-prename descclassname"><span class="pre">humancompatible.explain.fcx.FCX_binary_generation_adult.</span></span><span class="sig-name descname"><span class="pre">compute_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalise_weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validity_reg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_matrix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/humancompatible/explain/fcx/FCX_binary_generation_adult.html#compute_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.fcx.FCX_binary_generation_adult.compute_loss" title="Link to this definition"></a></dt>
+<dd><p>Compute the combined ELBO, validity hinge-loss, sparsity penalty,
+and causal regularization for a batch of examples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="fcx_unary_generation_adult.html#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE" title="humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE"><em>FCX_VAE</em></a>) – The VAE counterfactual generator.</p></li>
+<li><p><strong>model_out</strong> (<em>dict</em>) – Output of <cite>model.forward</cite>, containing:
+- em (Tensor): encoder means, shape (batch, latent_dim)
+- ev (Tensor): encoder variances, shape (batch, latent_dim)
+- z (Tensor): latent samples, list length mc_samples
+- x_pred (list[Tensor]): reconstructions per MC sample
+- mc_samples (int): number of Monte Carlo draws</p></li>
+<li><p><strong>x</strong> (<em>Tensor</em>) – Original input features, shape (batch, d).</p></li>
+<li><p><strong>target_label</strong> (<em>Tensor</em>) – True class labels (0 or 1), shape (batch,).</p></li>
+<li><p><strong>normalise_weights</strong> (<em>dict</em><em>[</em><em>int</em><em>, </em><em>tuple</em><em>(</em><em>float</em><em>, </em><em>float</em><em>)</em><em>]</em>) – Mapping feature index → (min, max) for proximity weighting.</p></li>
+<li><p><strong>validity_reg</strong> (<em>float</em>) – Weight of the validity hinge-loss term.</p></li>
+<li><p><strong>margin</strong> (<em>float</em>) – Hinge margin hyperparameter.</p></li>
+<li><p><strong>adj_matrix</strong> (<em>Tensor</em>) – Binary causal adjacency matrix, shape (d, d).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Scalar loss combining:</dt><dd><ul class="simple">
+<li><p>reconstruction error (L1 distance on mutable features)</p></li>
+<li><p>KL divergence</p></li>
+<li><p>validity hinge‑loss</p></li>
+<li><p>sparsity penalty</p></li>
+<li><p>causal regularization</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.FCX_binary_generation_adult.train_binary_fcx_vae">
+<span class="sig-prename descclassname"><span class="pre">humancompatible.explain.fcx.FCX_binary_generation_adult.</span></span><span class="sig-name descname"><span class="pre">train_binary_fcx_vae</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_data_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'data/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_model_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'models/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feasibility</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/humancompatible/explain/fcx/FCX_binary_generation_adult.html#train_binary_fcx_vae"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.fcx.FCX_binary_generation_adult.train_binary_fcx_vae" title="Link to this definition"></a></dt>
+<dd><p>Train the FCX‑VAE model to generate binary counterfactuals for the specified dataset.</p>
+<p>This function performs the full training pipeline:
+1. Sets random seeds and device.
+2. Builds an education-level penalty dictionary.
+3. Loads and preprocesses the Adult dataset, filtering only low-income samples.
+4. Loads normalization weights and the pretrained black-box classifier.
+5. Constructs the causal adjacency matrix and ensures it is a DAG.
+6. Initializes the FCX-VAE model and its optimizer.
+7. Runs a validity + feasibility constrained training loop for the given number of epochs.
+8. Saves the best model checkpoint and returns the trained VAE.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset_name</strong> (<em>str</em>) – Dataset identifier, e.g. <cite>‘adult’</cite>.</p></li>
+<li><p><strong>base_data_dir</strong> (<em>str</em>) – Path to the directory containing
+<cite>{dataset_name}-train-set.npy</cite>, <cite>{dataset_name}-val-set.npy</cite>,
+normalization JSONs, and adjacency CSVs.</p></li>
+<li><p><strong>base_model_dir</strong> (<em>str</em>) – Directory to load the black‐box model from
+and save the final VAE checkpoint.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Mini-batch size for VAE training.</p></li>
+<li><p><strong>epochs</strong> (<em>int</em>) – Number of training epochs.</p></li>
+<li><p><strong>validity</strong> (<em>float</em>) – Weight for the validity hinge‐loss term.</p></li>
+<li><p><strong>feasibility</strong> (<em>float</em>) – Weight for the causal feasibility regularizer.</p></li>
+<li><p><strong>margin</strong> (<em>float</em>) – Margin parameter for all hinge losses.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The trained VAE model instance, with its <cite>state_dict</cite> saved to
+<cite>{base_model_dir}/{dataset_name}-margin-{margin}-feasibility-{feasibility}-validity-{validity}-epoch-{epochs}-fcx-binary.pth</cite>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="fcx_unary_generation_adult.html#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE" title="humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE">FCX_VAE</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.FCX_binary_generation_adult.train_constraint_loss">
+<span class="sig-prename descclassname"><span class="pre">humancompatible.explain.fcx.FCX_binary_generation_adult.</span></span><span class="sig-name descname"><span class="pre">train_constraint_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalise_weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validity_reg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint_reg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_matrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ed_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/humancompatible/explain/fcx/FCX_binary_generation_adult.html#train_constraint_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.fcx.FCX_binary_generation_adult.train_constraint_loss" title="Link to this definition"></a></dt>
+<dd><p>Perform one epoch of FCX‑VAE training under causal and LOF constraints.</p>
+<p>This function iterates over the provided training data, computes the combined
+VAE ELBO loss, a causal constraint hinge loss education features,
+and a Local Outlier Factor (LOF) anomaly penalty on the latent codes. It then
+backpropagates and updates the model parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="fcx_unary_generation_adult.html#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE" title="humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE"><em>FCX_VAE</em></a>) – The counterfactual VAE model to train.</p></li>
+<li><p><strong>train_dataset</strong> (<em>ndarray</em>) – Array of shape (N, D+1), where the last column is
+the binary label used for counterfactual conditioning.</p></li>
+<li><p><strong>optimizer</strong> (<em>torch.optim.Optimizer</em>) – Optimizer instance for model parameters.</p></li>
+<li><p><strong>normalise_weights</strong> (<em>dict</em><em>[</em><em>int</em><em>, </em><em>tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em><em>]</em>) – Per-feature (min, max)
+normalization weights for continuous features.</p></li>
+<li><p><strong>validity_reg</strong> (<em>float</em>) – Weight for the validity hinge loss component.</p></li>
+<li><p><strong>constraint_reg</strong> (<em>float</em>) – Weight for the causal/LOF constraint loss.</p></li>
+<li><p><strong>margin</strong> (<em>float</em>) – Margin hyperparameter for hinge losses.</p></li>
+<li><p><strong>epochs</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of times to sample each datapoint (MC samples).
+Defaults to 1000.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em><em>, </em><em>optional</em>) – Mini-batch size for training. Defaults to 1024.</p></li>
+<li><p><strong>adj_matrix</strong> (<em>torch.Tensor</em><em>, </em><em>optional</em>) – Binary adjacency matrix enforcing causal
+dependencies. Shape (D, D).</p></li>
+<li><p><strong>ed_dict</strong> (<em>dict</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>, </em><em>optional</em>) – Mapping from categorical feature index to
+an education-level penalty coefficient.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The sum of training losses over all mini-batches.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class" id="module-humancompatible.explain.fcx.scripts.fcx_vae_model">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">humancompatible.explain.fcx.scripts.fcx_vae_model.</span></span><span class="sig-name descname"><span class="pre">FCX_VAE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoded_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">immutables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/humancompatible/explain/fcx/scripts/fcx_vae_model.html#FCX_VAE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Conditional Variational Autoencoder for generating feasible counterfactual explanations.</p>
+<p>This model encodes an input feature vector <cite>x</cite> concatenated with a target class label <cite>c</cite>
+into a latent representation, then decodes back to a counterfactual example. Supports
+multiple Monte Carlo draws and computes ELBO and validity conditioned outputs.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.immutables">
+<span class="sig-name descname"><span class="pre">immutables</span></span><a class="headerlink" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.immutables" title="Link to this definition"></a></dt>
+<dd><p>Number of initial immutable features (suffix features are mutable).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoded_size">
+<span class="sig-name descname"><span class="pre">encoded_size</span></span><a class="headerlink" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoded_size" title="Link to this definition"></a></dt>
+<dd><p>Dimensionality of the latent code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.data_size">
+<span class="sig-name descname"><span class="pre">data_size</span></span><a class="headerlink" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.data_size" title="Link to this definition"></a></dt>
+<dd><p>Number of input features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoded_categorical_feature_indexes">
+<span class="sig-name descname"><span class="pre">encoded_categorical_feature_indexes</span></span><a class="headerlink" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoded_categorical_feature_indexes" title="Link to this definition"></a></dt>
+<dd><p>Index ranges for one-hot categorical features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[List[int]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoded_continuous_feature_indexes">
+<span class="sig-name descname"><span class="pre">encoded_continuous_feature_indexes</span></span><a class="headerlink" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoded_continuous_feature_indexes" title="Link to this definition"></a></dt>
+<dd><p>Indices for continuous features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoded_start_cat">
+<span class="sig-name descname"><span class="pre">encoded_start_cat</span></span><a class="headerlink" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoded_start_cat" title="Link to this definition"></a></dt>
+<dd><p>Index where categorical features begin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoder_mean">
+<span class="sig-name descname"><span class="pre">encoder_mean</span></span><a class="headerlink" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoder_mean" title="Link to this definition"></a></dt>
+<dd><p>Network mapping input → latent mean.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>nn.Sequential</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoder_var">
+<span class="sig-name descname"><span class="pre">encoder_var</span></span><a class="headerlink" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoder_var" title="Link to this definition"></a></dt>
+<dd><p>Network mapping input → latent variance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>nn.Sequential</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.decoder_mean">
+<span class="sig-name descname"><span class="pre">decoder_mean</span></span><a class="headerlink" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.decoder_mean" title="Link to this definition"></a></dt>
+<dd><p>Network mapping latent + label → reconstructed features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>nn.Sequential</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.compute_elbo">
+<span class="sig-name descname"><span class="pre">compute_elbo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ret</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/humancompatible/explain/fcx/scripts/fcx_vae_model.html#FCX_VAE.compute_elbo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.compute_elbo" title="Link to this definition"></a></dt>
+<dd><p>Compute Evidence Lower Bound (ELBO) components for given inputs.</p>
+<p>If <cite>ret</cite> is True, also return de-normalized originals, reconstructions,
+predicted labels, and latent code for analysis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>torch.Tensor</em>) – Original features, may be truncated to mutable features if <cite>ret</cite>.</p></li>
+<li><p><strong>c</strong> (<em>torch.Tensor</em>) – Target labels, shape (batch_size,).</p></li>
+<li><p><strong>pred_model</strong> (<em>nn.Module</em>) – BlackBox classifier to evaluate validity.</p></li>
+<li><p><strong>ret</strong> (<em>bool</em>) – Whether to return extras for visualization.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>(log_px_z, kl_div, x, x_pred, cf_labels)
+If ret=True:</p>
+<blockquote>
+<div><p>(log_px_z, kl_div, x_orig, x_pred_mod, cf_labels, z_code)</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>If ret=False</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.decoder">
+<span class="sig-name descname"><span class="pre">decoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/humancompatible/explain/fcx/scripts/fcx_vae_model.html#FCX_VAE.decoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.decoder" title="Link to this definition"></a></dt>
+<dd><p>Decode latent code back to feature space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>z</strong> (<em>torch.Tensor</em>) – Concatenated latent code and label, shape (batch_size, encoded_size+1).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Reconstructed features, shape (batch_size, data_size).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoder">
+<span class="sig-name descname"><span class="pre">encoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/humancompatible/explain/fcx/scripts/fcx_vae_model.html#FCX_VAE.encoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.encoder" title="Link to this definition"></a></dt>
+<dd><p>Encode input (x + label) into latent mean and log‑variance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>torch.Tensor</em>) – Concatenated input and class label, shape (batch_size, data_size+1).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Latent means, shape (batch_size, encoded_size).
+logvar (torch.Tensor): Latent log-variances, shape (batch_size, encoded_size).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>mean (torch.Tensor)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/humancompatible/explain/fcx/scripts/fcx_vae_model.html#FCX_VAE.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.forward" title="Link to this definition"></a></dt>
+<dd><p>Generate multiple Monte Carlo counterfactual draws.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>torch.Tensor</em>) – Original features, shape (batch_size, data_size).</p></li>
+<li><p><strong>c</strong> (<em>torch.Tensor</em>) – Target class label (0/1), shape (batch_size,).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>{</dt><dd><p>‘em’: encoder means,
+‘ev’: encoder variances,
+‘z’: list of sampled latent codes,
+‘x_pred’: list of reconstructed counterfactuals,
+‘mc_samples’: int number of MC draws</p>
+</dd>
+</dl>
+<p>}</p>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.normal_likelihood">
+<span class="sig-name descname"><span class="pre">normal_likelihood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raxis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/humancompatible/explain/fcx/scripts/fcx_vae_model.html#FCX_VAE.normal_likelihood"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.normal_likelihood" title="Link to this definition"></a></dt>
+<dd><p>Compute the log-probability of x under N(mean, logvar).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>torch.Tensor</em>) – Original or reconstructed features.</p></li>
+<li><p><strong>mean</strong> (<em>torch.Tensor</em>) – Latent means.</p></li>
+<li><p><strong>logvar</strong> (<em>torch.Tensor</em>) – Latent variances.</p></li>
+<li><p><strong>raxis</strong> (<em>int</em>) – Axis along which to sum log-likelihood.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Log-likelihood per example.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.sample_latent_code">
+<span class="sig-name descname"><span class="pre">sample_latent_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/humancompatible/explain/fcx/scripts/fcx_vae_model.html#FCX_VAE.sample_latent_code"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.fcx.scripts.fcx_vae_model.FCX_VAE.sample_latent_code" title="Link to this definition"></a></dt>
+<dd><p>Perform the reparameterization trick to sample latent code.</p>
+<p>z = mean + sqrt(logvar) * eps, where eps ~ N(0, I).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mean</strong> (<em>torch.Tensor</em>) – Latent means.</p></li>
+<li><p><strong>logvar</strong> (<em>torch.Tensor</em>) – Latent log-variances.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sampled latent code.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function" id="module-humancompatible.explain.fcx.scripts.causal_modules">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.scripts.causal_modules.binarize_adj_matrix">
+<span class="sig-prename descclassname"><span class="pre">humancompatible.explain.fcx.scripts.causal_modules.</span></span><span class="sig-name descname"><span class="pre">binarize_adj_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adj_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/humancompatible/explain/fcx/scripts/causal_modules.html#binarize_adj_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.fcx.scripts.causal_modules.binarize_adj_matrix" title="Link to this definition"></a></dt>
+<dd><p>Converts the adjacency matrix to binary by applying a threshold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adj_matrix</strong> (<em>np.ndarray</em>) – Original adjacency matrix.</p></li>
+<li><p><strong>threshold</strong> (<em>float</em>) – Threshold to determine edge existence.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Binarized adjacency matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.scripts.causal_modules.causal_regularization_enhanced">
+<span class="sig-prename descclassname"><span class="pre">humancompatible.explain.fcx.scripts.causal_modules.</span></span><span class="sig-name descname"><span class="pre">causal_regularization_enhanced</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_nc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/humancompatible/explain/fcx/scripts/causal_modules.html#causal_regularization_enhanced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.fcx.scripts.causal_modules.causal_regularization_enhanced" title="Link to this definition"></a></dt>
+<dd><p>Enhanced causal regularization to enforce dependencies in outputs based on input adjacency matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>outputs</strong> (<em>torch.Tensor</em>) – Reconstructed outputs, shape (batch_size, input_dim)</p></li>
+<li><p><strong>adj_matrix</strong> (<em>torch.Tensor</em>) – Adjacency matrix from input space, shape (input_dim, input_dim)</p></li>
+<li><p><strong>lambda_nc</strong> (<em>float</em>) – Regularization strength for non-connected pairs</p></li>
+<li><p><strong>lambda_c</strong> (<em>float</em>) – Regularization strength for connected pairs</p></li>
+<li><p><strong>theta</strong> (<em>float</em>) – Covariance threshold for connected pairs</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Enhanced regularization loss</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.scripts.causal_modules.ensure_dag">
+<span class="sig-prename descclassname"><span class="pre">humancompatible.explain.fcx.scripts.causal_modules.</span></span><span class="sig-name descname"><span class="pre">ensure_dag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adj_matrix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/humancompatible/explain/fcx/scripts/causal_modules.html#ensure_dag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.fcx.scripts.causal_modules.ensure_dag" title="Link to this definition"></a></dt>
+<dd><p>Enforce that a given adjacency matrix represents a Directed Acyclic Graph (DAG).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>adj_matrix</strong> (<em>np.ndarray</em>) – Square binary adjacency matrix of shape (n, n), where
+entry (i, j) == 1 indicates a directed edge i → j.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A modified adjacency matrix of the same shape, guaranteed to be acyclic (a DAG).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class" id="module-humancompatible.explain.fcx.LOFLoss">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.LOFLoss.LOFLoss">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">humancompatible.explain.fcx.LOFLoss.</span></span><span class="sig-name descname"><span class="pre">LOFLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neighbors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/humancompatible/explain/fcx/LOFLoss.html#LOFLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.fcx.LOFLoss.LOFLoss" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Local Outlier Factor (LOF) as a differentiable loss for anomaly detection.</p>
+<p>This loss computes the average LOF score over a batch of input vectors,
+penalizing points that are outliers in the feature space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_neighbors</strong> (<em>int</em>) – Number of nearest neighbors to consider (excluding self) when
+computing reachability distances. Default is 20.</p></li>
+<li><p><strong>epsilon</strong> (<em>float</em>) – Small constant to ensure numerical stability (no zero distances
+or division by zero). Default is 1e-8.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.LOFLoss.LOFLoss.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/humancompatible/explain/fcx/LOFLoss.html#LOFLoss.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.fcx.LOFLoss.LOFLoss.forward" title="Link to this definition"></a></dt>
+<dd><p>Compute the LOF loss (mean LOF score) for the input batch.</p>
+<dl class="simple">
+<dt>Steps:</dt><dd><ol class="arabic simple">
+<li><p>Compute pairwise distances.</p></li>
+<li><p>Identify the k nearest neighbors for each point (excluding self).</p></li>
+<li><p>Compute reachability distances: max(distance_to_neighbor, neighbor_kth_distance).</p></li>
+<li><p>Compute local reachability density (LRD) for each point.</p></li>
+<li><p>Compute LOF score as the average ratio of neighbors’ LRD to own LRD.</p></li>
+<li><p>Return the mean LOF score over all points.</p></li>
+</ol>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input</strong> (<em>torch.Tensor</em>) – Input tensor of shape (batch_size, feature_dim).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Scalar tensor containing the mean LOF score across the batch.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.LOFLoss.LOFLoss.pairwise_distances">
+<span class="sig-name descname"><span class="pre">pairwise_distances</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/humancompatible/explain/fcx/LOFLoss.html#LOFLoss.pairwise_distances"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.fcx.LOFLoss.LOFLoss.pairwise_distances" title="Link to this definition"></a></dt>
+<dd><p>Compute the pairwise Euclidean distances between rows of x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>torch.Tensor</em>) – Input tensor of shape (batch_size, feature_dim).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A (batch_size × batch_size) distance matrix, where entry
+(i, j) is the Euclidean distance between x[i] and x[j].</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function" id="module-humancompatible.explain.fcx.scripts.datagen_func">
+<dt class="sig sig-object py" id="humancompatible.explain.fcx.scripts.datagen_func.prepare_datasets">
+<span class="sig-prename descclassname"><span class="pre">humancompatible.explain.fcx.scripts.datagen_func.</span></span><span class="sig-name descname"><span class="pre">prepare_datasets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'../data/'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/humancompatible/explain/fcx/scripts/datagen_func.html#prepare_datasets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.fcx.scripts.datagen_func.prepare_datasets" title="Link to this definition"></a></dt>
+<dd><p>Prepare and save train/validation/test splits plus normalization metadata
+for a given dataset (Only in case the provided csv/npy files are missing or for custom solutions).</p>
+<dl class="simple">
+<dt>This will:</dt><dd><ol class="arabic simple">
+<li><p>Load one of: ‘adult’, ‘folktables_adult’, ‘census’, or ‘law’.</p></li>
+<li><p>Filter / slice the raw DataFrame as in your original logic.</p></li>
+<li><p>Compute median absolute deviations (MAD) and per-feature min/max.</p></li>
+<li><p>One‑hot encode, normalize continuous features, and reorder columns.</p></li>
+<li><p>Split into 10% test, 10% validation, and the rest training.</p></li>
+<li><p>Save:
+- <cite>{base_dir}/{dataset_name}-train-set.npy</cite>
+- <cite>{base_dir}/{dataset_name}-val-set.npy</cite>
+- <cite>{base_dir}/{dataset_name}-test-set.npy</cite>
+- <cite>{base_dir}/{dataset_name}-normalise_weights.json</cite>
+- <cite>{base_dir}/{dataset_name}-mad.json</cite></p></li>
+</ol>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset_name</strong> (<em>str</em>) – which dataset to prepare; one of
+‘adult’, ‘folktables_adult’, ‘census’, or ‘law’.</p></li>
+<li><p><strong>base_dir</strong> (<em>str</em>) – directory under which to write out the .npy and .json files.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="fcx_unary_generation_adult.html" class="btn btn-neutral float-left" title="FCX Unary Constraint Training (Adult)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="blackbox_model_train.html" class="btn btn-neutral float-right" title="FCX BlackBox Model training (Adult)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, AutoFair Project.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

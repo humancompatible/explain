@@ -1,0 +1,348 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>humancompatible.explain.glance.local_cfs.random_sampling &mdash; HumanCompatible.Explain  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            HumanCompatible.Explain
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../facts.html">FACTS: Fairness Aware Counterfactual for Subgrouos package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../glance.html">GLANCE: Global Actions in a Nutshell for Counterfactual Explainability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../fcx.html">FCX: Finding Feasible Counterfactual Explanation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">HumanCompatible.Explain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">humancompatible.explain.glance.local_cfs.random_sampling</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for humancompatible.explain.glance.local_cfs.random_sampling</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..base</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalCounterfactualMethod</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.inspection</span><span class="w"> </span><span class="kn">import</span> <span class="n">permutation_importance</span>
+
+<div class="viewcode-block" id="RandomSampling">
+<a class="viewcode-back" href="../../../../../glance.local_cfs.html#humancompatible.explain.glance.local_cfs.random_sampling.RandomSampling">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RandomSampling</span><span class="p">(</span><span class="n">LocalCounterfactualMethod</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    RandomSampling is a local counterfactual method that generates counterfactual instances </span>
+<span class="sd">    through random sampling based on the distribution of features in the unaffected training data.</span>
+
+<span class="sd">    This method identifies the most important features and the most frequent categories within the </span>
+<span class="sd">    unaffected training data to generate counterfactuals by sampling from these distributions.</span>
+
+<span class="sd">    Methods:</span>
+<span class="sd">    --------</span>
+<span class="sd">    __init__(model, n_most_important, n_categorical_most_frequent, numerical_features, categorical_features, random_state=None):</span>
+<span class="sd">        Initializes the RandomSampling instance with the specified parameters.</span>
+
+<span class="sd">    fit(X, y):</span>
+<span class="sd">        Fits the RandomSampling method to the provided training data by calculating feature importances and identifying unaffected instances.</span>
+
+<span class="sd">    _sample_instances(n_samples, fixed_feature_values, random_state=None):</span>
+<span class="sd">        Samples instances based on the specified feature distributions, fixing certain feature values while sampling others.</span>
+
+<span class="sd">    explain(instance, num_counterfactuals, n_samples=1000, random_state=None):</span>
+<span class="sd">        Generates counterfactual explanations for a given instance by sampling and modifying feature values.</span>
+
+<span class="sd">    explain_instances(instances, num_counterfactuals, n_samples=1000, random_state=None):</span>
+<span class="sd">        Generates counterfactuals for multiple instances by calling the explain method for each instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">n_most_important</span><span class="p">,</span> <span class="n">n_categorical_most_frequent</span><span class="p">,</span> <span class="n">numerical_features</span><span class="p">,</span> <span class="n">categorical_features</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a new instance of the RandomSampling class.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model : object</span>
+<span class="sd">            A machine learning model used for predictions and feature importance evaluation.</span>
+<span class="sd">        n_most_important : int</span>
+<span class="sd">            The number of most important features to consider when generating counterfactuals.</span>
+<span class="sd">        n_categorical_most_frequent : int</span>
+<span class="sd">            The number of most frequent categories to consider for categorical features.</span>
+<span class="sd">        numerical_features : List[str]</span>
+<span class="sd">            A list of continuous (numerical) feature names.</span>
+<span class="sd">        categorical_features : List[str]</span>
+<span class="sd">            A list of categorical feature names.</span>
+<span class="sd">        random_state : int, optional</span>
+<span class="sd">            Seed for random number generation to ensure reproducibility, by default None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_most_important</span> <span class="o">=</span> <span class="n">n_most_important</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_categorical_most_frequent</span> <span class="o">=</span> <span class="n">n_categorical_most_frequent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numerical_features</span> <span class="o">=</span> <span class="n">numerical_features</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">categorical_features</span> <span class="o">=</span> <span class="n">categorical_features</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
+
+<div class="viewcode-block" id="RandomSampling.fit">
+<a class="viewcode-back" href="../../../../../glance.local_cfs.html#humancompatible.explain.glance.local_cfs.random_sampling.RandomSampling.fit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fits the RandomSampling method to the provided training data by calculating feature importances and identifying unaffected instances.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : pd.DataFrame</span>
+<span class="sd">            The training dataset containing feature columns.</span>
+<span class="sd">        y : pd.Series</span>
+<span class="sd">            The target variable corresponding to the training dataset.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        -------</span>
+<span class="sd">        self : RandomSampling</span>
+<span class="sd">            Returns the fitted instance of RandomSampling.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X_</span> <span class="o">=</span> <span class="n">X</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_names_</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="c1"># Permutation feature importance</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">permutation_importance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_importances_</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">importances_mean</span>
+        <span class="n">top_k_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_importances_</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="bp">self</span><span class="o">.</span><span class="n">n_most_important</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_k_features_</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">top_k_indices</span><span class="p">]</span>
+
+        <span class="n">train_preds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">unaffected</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">train_preds</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Store min and max values for numerical features</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numeric_min_</span> <span class="o">=</span> <span class="n">unaffected</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">numerical_features</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numeric_max_</span> <span class="o">=</span> <span class="n">unaffected</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">numerical_features</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">numerical_features</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numeric_min_</span><span class="p">[</span><span class="n">f</span><span class="p">]):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">numeric_min_</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numeric_max_</span><span class="p">[</span><span class="n">f</span><span class="p">]):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">numeric_max_</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+        <span class="c1"># Get the top m most frequent categories for categorical features</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">categorical_top_m_</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categorical_features</span><span class="p">:</span>
+            <span class="n">top_categories</span> <span class="o">=</span> <span class="n">unaffected</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">n_categorical_most_frequent</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">top_categories</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                <span class="n">top_categories</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">n_categorical_most_frequent</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">categorical_top_m_</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">top_categories</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sample_instances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">fixed_feature_values</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Samples instances based on the specified feature distributions, fixing certain feature values while sampling others.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n_samples : int</span>
+<span class="sd">            The number of instances to sample.</span>
+<span class="sd">        fixed_feature_values : dict</span>
+<span class="sd">            A dictionary of feature names and their fixed values during sampling.</span>
+<span class="sd">        random_state : int, optional</span>
+<span class="sd">            Seed for random number generation, by default None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.DataFrame</span>
+<span class="sd">            A DataFrame containing the sampled instances with the same feature structure as the original data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">random_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
+        <span class="n">samples_columns</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">fixed_feature_values</span><span class="p">:</span>
+                <span class="n">column</span> <span class="o">=</span> <span class="p">[</span><span class="n">fixed_feature_values</span><span class="p">[</span><span class="n">col</span><span class="p">]]</span> <span class="o">*</span> <span class="n">n_samples</span>
+            <span class="k">elif</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">numerical_features</span><span class="p">:</span>
+                <span class="n">column</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numeric_min_</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_max_</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">n_samples</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">column</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">categorical_top_m_</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">n_samples</span><span class="p">)</span>
+            <span class="n">samples_columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">col_name</span><span class="p">:</span> <span class="n">column</span> <span class="k">for</span> <span class="n">col_name</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">samples_columns</span><span class="p">)})</span>
+    
+<div class="viewcode-block" id="RandomSampling.explain">
+<a class="viewcode-back" href="../../../../../glance.local_cfs.html#humancompatible.explain.glance.local_cfs.random_sampling.RandomSampling.explain">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">explain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">num_counterfactuals</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates counterfactual explanations for a given instance by sampling and modifying feature values.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        ----------</span>
+<span class="sd">        instance : pd.DataFrame</span>
+<span class="sd">            A single row DataFrame representing the instance for which counterfactuals are generated.</span>
+<span class="sd">        num_counterfactuals : int</span>
+<span class="sd">            The number of counterfactuals to generate.</span>
+<span class="sd">        n_samples : int, optional</span>
+<span class="sd">            The number of samples to draw for generating counterfactuals, by default 1000.</span>
+<span class="sd">        random_state : int, optional</span>
+<span class="sd">            Seed for random number generation, by default None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.DataFrame</span>
+<span class="sd">            A DataFrame containing the generated counterfactuals for the provided instance.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises:</span>
+<span class="sd">        -------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the input instance is not a single-row DataFrame or if its columns do not match the training dataset&#39;s columns.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if instance is a single row DataFrame</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="ow">or</span> <span class="n">instance</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input must be a single row DataFrame.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Check if the DataFrame columns match the features provided during initialization</span>
+        <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Columns of the input instance do not match the columns used during fitting.&quot;</span><span class="p">)</span>
+
+        <span class="n">fixed_feature_values</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_names_</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">top_k_features_</span><span class="p">:</span>
+                <span class="n">fixed_feature_values</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">instance</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="n">random_instances</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_instances</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">fixed_feature_values</span><span class="p">,</span> <span class="n">random_state</span><span class="p">)</span>
+
+        <span class="c1"># Generate copies of the query instance that will be changed one feature</span>
+        <span class="c1"># at a time to encourage sparsity.</span>
+        <span class="n">cfs_df</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">candidate_cfs</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">col</span><span class="p">:</span> <span class="n">col</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">n_samples</span><span class="p">))</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># Loop to change one feature at a time, then two features, and so on.</span>
+        <span class="k">for</span> <span class="n">num_features_to_vary</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">top_k_features_</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">selected_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">top_k_features_</span><span class="p">,</span> <span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
+                <span class="n">candidate_cfs</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">random_instances</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="n">preds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">candidate_cfs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">preds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">rows_to_add</span> <span class="o">=</span> <span class="n">candidate_cfs</span><span class="p">[</span><span class="n">preds</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">cfs_df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">cfs_df</span> <span class="o">=</span> <span class="n">rows_to_add</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">cfs_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">cfs_df</span><span class="p">,</span> <span class="n">rows_to_add</span><span class="p">])</span>
+                <span class="n">cfs_df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="c1"># Always change at least 2 features before stopping</span>
+                <span class="k">if</span> <span class="n">num_features_to_vary</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">cfs_df</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">num_counterfactuals</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">cfs_df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cfs_df</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cfs_df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">num_counterfactuals</span><span class="p">:</span>
+            <span class="n">cfs_df</span> <span class="o">=</span> <span class="n">cfs_df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">num_counterfactuals</span><span class="p">)</span>
+        <span class="n">cfs_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cfs_df</span></div>
+
+
+<div class="viewcode-block" id="RandomSampling.explain_instances">
+<a class="viewcode-back" href="../../../../../glance.local_cfs.html#humancompatible.explain.glance.local_cfs.random_sampling.RandomSampling.explain_instances">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">explain_instances</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">instances</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">num_counterfactuals</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates counterfactuals for multiple instances by calling the explain method for each instance.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        ----------</span>
+<span class="sd">        instances : pd.DataFrame</span>
+<span class="sd">            DataFrame containing instances for which counterfactual explanations are needed.</span>
+<span class="sd">        num_counterfactuals : int</span>
+<span class="sd">            The number of counterfactuals to generate for each instance.</span>
+<span class="sd">        n_samples : int, optional</span>
+<span class="sd">            The number of samples to draw for generating counterfactuals, by default 1000.</span>
+<span class="sd">        random_state : int, optional</span>
+<span class="sd">            Seed for random number generation, by default None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.DataFrame</span>
+<span class="sd">            A DataFrame containing the generated counterfactuals for all provided instances.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cfs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">instances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">cfs_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">explain</span><span class="p">(</span><span class="n">instances</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">num_counterfactuals</span><span class="o">=</span><span class="n">num_counterfactuals</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cfs_instance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">cfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cfs_instance</span><span class="p">)</span>
+        
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">cfs</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">if</span> <span class="n">cfs</span> <span class="o">!=</span> <span class="p">[]</span> <span class="k">else</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">instances</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">instances</span><span class="o">.</span><span class="n">dtypes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, AutoFair Project.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

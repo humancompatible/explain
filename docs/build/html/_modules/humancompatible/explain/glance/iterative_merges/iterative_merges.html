@@ -1,0 +1,1414 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>humancompatible.explain.glance.iterative_merges.iterative_merges &mdash; HumanCompatible.Explain  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            HumanCompatible.Explain
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../facts.html">FACTS: Fairness Aware Counterfactual for Subgrouos package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../glance.html">GLANCE: Global Actions in a Nutshell for Counterfactual Explainability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../fcx.html">FCX: Finding Feasible Counterfactual Explanation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">HumanCompatible.Explain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">humancompatible.explain.glance.iterative_merges.iterative_merges</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for humancompatible.explain.glance.iterative_merges.iterative_merges</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Literal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numbers</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">colorama</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fore</span><span class="p">,</span> <span class="n">Style</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.cluster.hierarchy</span><span class="w"> </span><span class="kn">import</span> <span class="n">DisjointSet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">OneHotEncoder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.compose</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColumnTransformer</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">display</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..base</span><span class="w"> </span><span class="kn">import</span> <span class="n">GlobalCounterfactualMethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..base</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalCounterfactualMethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..base</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClusteringMethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.centroid</span><span class="w"> </span><span class="kn">import</span> <span class="n">centroid_pandas</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.action</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">apply_action_pandas</span><span class="p">,</span>
+    <span class="n">actions_mean_pandas</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..counterfactual_costs</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_dist_func_dataframe</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.metadata_requests</span><span class="w"> </span><span class="kn">import</span> <span class="n">_decide_cluster_method</span><span class="p">,</span> <span class="n">_decide_local_cf_method</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.phase2</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_cluster_centroid_explanations</span>
+
+
+<div class="viewcode-block" id="C_GLANCE">
+<a class="viewcode-back" href="../../../../../glance.iterative_merges.html#humancompatible.explain.glance.iterative_merges.iterative_merges.C_GLANCE">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">C_GLANCE</span><span class="p">(</span><span class="n">GlobalCounterfactualMethod</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for generating global counterfactual explanations using an iterative merging approach.</span>
+<span class="sd">    </span>
+<span class="sd">    It allows the user to control the number of clusters and the methods used </span>
+<span class="sd">    for clustering and generating counterfactuals.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : Any</span>
+<span class="sd">        The predictive model used for generating counterfactuals.</span>
+<span class="sd">    initial_clusters : int</span>
+<span class="sd">        The initial number of clusters to form.</span>
+<span class="sd">    final_clusters : int</span>
+<span class="sd">        The target number of clusters after merging.</span>
+<span class="sd">    num_local_counterfactuals : int</span>
+<span class="sd">        The number of local counterfactuals to generate for each cluster.</span>
+<span class="sd">    heuristic_weights : Tuple[float, float]</span>
+<span class="sd">        Weights used in the heuristic for merging clusters.</span>
+<span class="sd">    alternative_merges : bool</span>
+<span class="sd">        If True, allows alternative merging strategies.</span>
+<span class="sd">    random_seed : int</span>
+<span class="sd">        Seed for random number generation.</span>
+<span class="sd">    verbose : bool</span>
+<span class="sd">        If True, enables verbose output during processing.</span>
+<span class="sd">    final_clustering : Optional[Dict[int, pd.DataFrame]]</span>
+<span class="sd">        The final clustering of instances after merging.</span>
+<span class="sd">    cluster_results : Optional[Dict[int, Dict[str, Any]]]</span>
+<span class="sd">        Results of the clustering including effectiveness and cost metrics.</span>
+
+<span class="sd">    Methods:</span>
+<span class="sd">    -------</span>
+<span class="sd">    _set_features_names(X, numerical_names, categorical_names):</span>
+<span class="sd">        Sets the feature names for numerical and categorical features.</span>
+<span class="sd">    </span>
+<span class="sd">    fit(X, y, train_dataset, feat_to_vary, numeric_features_names, categorical_features_names,</span>
+<span class="sd">        clustering_method, cf_generator, cluster_action_choice_algo, ...)</span>
+<span class="sd">        Fits the clustering and counterfactual generation model to the provided dataset.</span>
+<span class="sd">    </span>
+<span class="sd">    explain_group(instances):</span>
+<span class="sd">        Explains the group of instances by generating counterfactuals based on clustering.</span>
+<span class="sd">    </span>
+<span class="sd">    global_actions():</span>
+<span class="sd">        Retrieves the global actions derived from the clustered results.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">initial_clusters</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="n">final_clusters</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">num_local_counterfactuals</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">heuristic_weights</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+        <span class="n">alternative_merges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">random_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">13</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the IterativeMerges instance.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model : Any</span>
+<span class="sd">            The predictive model used for generating counterfactuals.</span>
+<span class="sd">        initial_clusters : int, optional</span>
+<span class="sd">            The initial number of clusters to form. Default is 100.</span>
+<span class="sd">        final_clusters : int, optional</span>
+<span class="sd">            The target number of clusters after merging. Default is 10.</span>
+<span class="sd">        num_local_counterfactuals : int, optional</span>
+<span class="sd">            The number of local counterfactuals to generate for each cluster. Default is 5.</span>
+<span class="sd">        heuristic_weights : Tuple[float, float], optional</span>
+<span class="sd">            Weights used in the heuristic for merging clusters. Default is (0.5, 0.5).</span>
+<span class="sd">        alternative_merges : bool, optional</span>
+<span class="sd">            If True, allows alternative merging strategies. Default is True.</span>
+<span class="sd">        random_seed : int, optional</span>
+<span class="sd">            Seed for random number generation. Default is 13.</span>
+<span class="sd">        verbose : bool, optional</span>
+<span class="sd">            If True, enables verbose output during processing. Default is True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_clusters</span> <span class="o">=</span> <span class="n">initial_clusters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_clusters</span> <span class="o">=</span> <span class="n">final_clusters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_local_counterfactuals</span> <span class="o">=</span> <span class="n">num_local_counterfactuals</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">heuristic_weights</span> <span class="o">=</span> <span class="n">heuristic_weights</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alternative_merges</span> <span class="o">=</span> <span class="n">alternative_merges</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_seed</span> <span class="o">=</span> <span class="n">random_seed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_clustering</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clusters_results</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_features_names</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">numerical_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+        <span class="n">categorical_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the feature names for numerical and categorical features.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : pd.DataFrame</span>
+<span class="sd">            The dataset to analyze.</span>
+<span class="sd">        numerical_names : Optional[List[str]]</span>
+<span class="sd">            List of numerical feature names. If None, they will be inferred from X.</span>
+<span class="sd">        categorical_names : Optional[List[str]]</span>
+<span class="sd">            List of categorical feature names. If None, they will be inferred from X.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        -------</span>
+<span class="sd">        Tuple[List[str], List[str]]</span>
+<span class="sd">            A tuple containing lists of numerical and categorical feature names.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">numerical_names</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">categorical_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">numerical_names</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span>
+                <span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;number&quot;</span><span class="p">]</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">categorical_names</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span>
+                <span class="n">numerical_names</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">numerical_names</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">categorical_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">numerical_names</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">categorical_names</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">numerical_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">categorical_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">categorical_names</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">numerical_names</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        
+        <span class="k">assert</span> <span class="n">numerical_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">categorical_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">numerical_names</span><span class="p">,</span> <span class="n">categorical_names</span>
+    
+<div class="viewcode-block" id="C_GLANCE.fit">
+<a class="viewcode-back" href="../../../../../glance.iterative_merges.html#humancompatible.explain.glance.iterative_merges.iterative_merges.C_GLANCE.fit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+        <span class="n">train_dataset</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">feat_to_vary</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
+        <span class="n">numeric_features_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">categorical_features_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">clustering_method</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ClusteringMethod</span><span class="p">,</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;KMeans&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;KMeans&quot;</span><span class="p">,</span>
+        <span class="n">cf_generator</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+            <span class="n">LocalCounterfactualMethod</span><span class="p">,</span>
+            <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;Dice&quot;</span><span class="p">,</span> <span class="s2">&quot;NearestNeighbors&quot;</span><span class="p">,</span> <span class="s2">&quot;RandomSampling&quot;</span><span class="p">]</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Dice&quot;</span><span class="p">,</span>
+        <span class="n">cluster_action_choice_algo</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;max-eff&quot;</span><span class="p">,</span> <span class="s2">&quot;mean-act&quot;</span><span class="p">,</span> <span class="s2">&quot;low-cost&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;max-eff&quot;</span><span class="p">,</span>
+        <span class="n">nns__n_scalars</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">rs__n_most_important</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">rs__n_categorical_most_frequent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">lowcost__action_threshold</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">lowcost__num_low_cost</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">min_cost_eff_thres__effectiveness_threshold</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">min_cost_eff_thres_combinations__num_min_cost</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">eff_thres_hybrid__max_n_actions_full_combinations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;C_GLANCE&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fits the clustering and counterfactual generation model to the provided dataset.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : pd.DataFrame</span>
+<span class="sd">            Features of the dataset.</span>
+<span class="sd">        y : pd.Series</span>
+<span class="sd">            Target variable.</span>
+<span class="sd">        train_dataset : pd.DataFrame</span>
+<span class="sd">            The training dataset used for local counterfactual generation methods.</span>
+<span class="sd">        feat_to_vary : Optional[Union[List[str], str]], optional</span>
+<span class="sd">            Features to vary in counterfactual generation. Default is &quot;all&quot;.</span>
+<span class="sd">        numeric_features_names : Optional[List[str]], optional</span>
+<span class="sd">            List of numeric feature names. If None, they will be inferred from X.</span>
+<span class="sd">        categorical_features_names : Optional[List[str]], optional</span>
+<span class="sd">            List of categorical feature names. If None, they will be inferred from X.</span>
+<span class="sd">        clustering_method : Union[ClusteringMethod, Literal[&quot;KMeans&quot;]], optional</span>
+<span class="sd">            The clustering method to use. Default is &quot;KMeans&quot;.</span>
+<span class="sd">        cf_generator : Union[LocalCounterfactualMethod, Literal[&quot;Dice&quot;, &quot;NearestNeighbors&quot;, &quot;RandomSampling&quot;]], optional</span>
+<span class="sd">            The local counterfactual generation method to use. Default is &quot;Dice&quot;.</span>
+<span class="sd">        cluster_action_choice_algo : Literal[&quot;max-eff&quot;, &quot;mean-act&quot;, &quot;low-cost&quot;&quot;], optional</span>
+<span class="sd">            The algorithm for selecting actions from clusters. Default is &quot;max-eff&quot;.</span>
+<span class="sd">        nns__n_scalars : Optional[int], optional</span>
+<span class="sd">            Number of scalar features to use for nearest neighbors. Default is None.</span>
+<span class="sd">        rs__n_most_important : Optional[int], optional</span>
+<span class="sd">            Number of most important features for random sampling. Default is None.</span>
+<span class="sd">        rs__n_categorical_most_frequent : Optional[int], optional</span>
+<span class="sd">            Number of most frequent categorical features for random sampling. Default is None.</span>
+<span class="sd">        lowcost__action_threshold : Optional[int], optional</span>
+<span class="sd">            Action threshold for low-cost methods. Default is None.</span>
+<span class="sd">        lowcost__num_low_cost : Optional[int], optional</span>
+<span class="sd">            Number of low-cost actions to consider. Default is None.</span>
+<span class="sd">        min_cost_eff_thres__effectiveness_threshold : Optional[float], optional</span>
+<span class="sd">            Effectiveness threshold for minimum cost methods. Default is None.</span>
+<span class="sd">        min_cost_eff_thres_combinations__num_min_cost : Optional[int], optional</span>
+<span class="sd">            Number of minimum cost combinations to evaluate. Default is None.</span>
+<span class="sd">        eff_thres_hybrid__max_n_actions_full_combinations : Optional[int], optional</span>
+<span class="sd">            Maximum number of actions for full combinations in hybrid thresholding. Default is None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        -------</span>
+<span class="sd">        IterativeMerges</span>
+<span class="sd">            Returns the fitted instance of IterativeMerges.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numerical_features_names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">categorical_features_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_features_names</span><span class="p">(</span>
+            <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span>
+            <span class="n">numerical_names</span><span class="o">=</span><span class="n">numeric_features_names</span><span class="p">,</span>
+            <span class="n">categorical_names</span><span class="o">=</span><span class="n">categorical_features_names</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">X</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span> <span class="o">=</span> <span class="n">train_dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clustering_method_</span> <span class="o">=</span> <span class="n">clustering_method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_threshold</span> <span class="o">=</span> <span class="n">lowcost__action_threshold</span> <span class="k">if</span> <span class="n">lowcost__action_threshold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mf">1.5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_low_cost</span> <span class="o">=</span> <span class="n">lowcost__num_low_cost</span> <span class="k">if</span> <span class="n">lowcost__num_low_cost</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">20</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">effectiveness_threshold</span> <span class="o">=</span> <span class="n">min_cost_eff_thres__effectiveness_threshold</span> <span class="k">if</span> <span class="n">min_cost_eff_thres__effectiveness_threshold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mf">0.1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_cost_eff_thres_combinations__num_min_cost</span> <span class="o">=</span> <span class="n">min_cost_eff_thres_combinations__num_min_cost</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cluster_action_choice_algo</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;max-eff&quot;</span><span class="p">,</span> <span class="s2">&quot;mean-act&quot;</span><span class="p">,</span> <span class="s2">&quot;low-cost&quot;</span><span class="p">,</span> <span class="s2">&quot;min-cost-eff-thres&quot;</span><span class="p">,</span> <span class="s2">&quot;min-cost-eff-thres-combinations&quot;</span><span class="p">,</span> <span class="s2">&quot;hybrid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cluster_action_choice_algo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eff_thres_hybrid__max_n_actions_full_combinations</span> <span class="o">=</span> <span class="n">eff_thres_hybrid__max_n_actions_full_combinations</span> <span class="k">if</span> <span class="n">eff_thres_hybrid__max_n_actions_full_combinations</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">50</span>
+        
+        <span class="k">if</span> <span class="n">nns__n_scalars</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_scalars</span> <span class="o">=</span> <span class="n">nns__n_scalars</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_scalars</span> <span class="o">=</span> <span class="mi">1000</span>
+        <span class="k">if</span> <span class="n">rs__n_most_important</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_most_important</span> <span class="o">=</span> <span class="n">rs__n_most_important</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_most_important</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rs__n_categorical_most_frequent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_categorical_most_frequent</span> <span class="o">=</span> <span class="n">rs__n_categorical_most_frequent</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_categorical_most_frequent</span> <span class="o">=</span> <span class="mi">20</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">cf_generator</span> <span class="o">=</span> <span class="n">_decide_local_cf_method</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="n">cf_generator</span><span class="p">,</span>
+            <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">train_dataset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span>
+            <span class="n">numeric_features_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">numerical_features_names</span><span class="p">,</span>
+            <span class="n">categorical_features_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">categorical_features_names</span><span class="p">,</span>
+            <span class="n">feat_to_vary</span><span class="o">=</span><span class="n">feat_to_vary</span><span class="p">,</span>
+            <span class="n">random_seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_seed</span><span class="p">,</span>
+            <span class="n">n_scalars</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_scalars</span><span class="p">,</span>
+            <span class="n">n_most_important</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_most_important</span><span class="p">,</span>
+            <span class="n">n_categorical_most_frequent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_categorical_most_frequent</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist_func_dataframe</span> <span class="o">=</span> <span class="n">build_dist_func_dataframe</span><span class="p">(</span>
+                <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span>
+                <span class="n">numerical_columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">numerical_features_names</span><span class="p">,</span>
+                <span class="n">categorical_columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">categorical_features_names</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="C_GLANCE.explain_group">
+<a class="viewcode-back" href="../../../../../glance.iterative_merges.html#humancompatible.explain.glance.iterative_merges.iterative_merges.C_GLANCE.explain_group">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">explain_group</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">instances</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Explains the group of instances by generating counterfactuals based on clustering.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        ----------</span>
+<span class="sd">        instances : pd.DataFrame</span>
+<span class="sd">            The group of instances to explain.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        -------</span>
+<span class="sd">        Tuple[int, float]</span>
+<span class="sd">            A tuple containing the total effectiveness and total cost of the generated counterfactuals.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_clusters</span> <span class="o">&gt;</span> <span class="n">instances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Requested number of initial clusters is larger than the number of instances to explain. Setting to number of instances.&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initial_clusters</span> <span class="o">=</span> <span class="n">instances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clustering_method</span> <span class="o">=</span> <span class="n">_decide_cluster_method</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clustering_method_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_clusters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_seed</span>
+        <span class="p">)</span>
+
+        <span class="n">clusters</span> <span class="o">=</span> <span class="n">_generate_clusters</span><span class="p">(</span>
+            <span class="n">instances</span><span class="o">=</span><span class="n">instances</span><span class="p">,</span>
+            <span class="n">num_clusters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">initial_clusters</span><span class="p">,</span>
+            <span class="n">categorical_features_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">categorical_features_names</span><span class="p">,</span>
+            <span class="n">clustering_method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">clustering_method</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">cluster_centroids</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">i</span><span class="p">:</span> <span class="n">centroid_pandas</span><span class="p">(</span>
+                <span class="n">X</span><span class="o">=</span><span class="n">instances</span><span class="p">,</span>
+                <span class="n">numerical_columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">numerical_features_names</span><span class="p">,</span>
+                <span class="n">categorical_columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">categorical_features_names</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">instances</span> <span class="ow">in</span> <span class="n">clusters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+
+        <span class="n">cluster_explanations</span><span class="p">,</span> <span class="n">cluster_expl_actions</span><span class="p">,</span> <span class="n">explanations_centroid</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">generate_cluster_centroid_explanations</span><span class="p">(</span>
+                <span class="n">cluster_centroids</span><span class="o">=</span><span class="n">cluster_centroids</span><span class="p">,</span>
+                <span class="n">cf_generator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cf_generator</span><span class="p">,</span>
+                <span class="n">num_local_counterfactuals</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_local_counterfactuals</span><span class="p">,</span>
+                <span class="n">numerical_features_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">numerical_features_names</span><span class="p">,</span>
+                <span class="n">categorical_features_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">categorical_features_names</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="c1"># delete clusters with no explanations</span>
+        <span class="n">clusters</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">cluster</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="n">clusters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cluster_explanations</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+        <span class="n">cluster_centroids</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">cluster</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="n">cluster_centroids</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cluster_explanations</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_clusters</span><span class="p">:</span>
+            <span class="n">cluster1</span><span class="p">,</span> <span class="n">cluster2</span> <span class="o">=</span> <span class="n">_find_candidate_clusters</span><span class="p">(</span>
+                <span class="n">clusters</span><span class="o">=</span><span class="n">clusters</span><span class="p">,</span>
+                <span class="n">cluster_centroids</span><span class="o">=</span><span class="n">cluster_centroids</span><span class="p">,</span>
+                <span class="n">explanations_centroid</span><span class="o">=</span><span class="n">explanations_centroid</span><span class="p">,</span>
+                <span class="n">heuristic_weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">heuristic_weights</span><span class="p">,</span>
+                <span class="n">dist_func_dataframe</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dist_func_dataframe</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">_merge_clusters</span><span class="p">(</span>
+                <span class="n">cluster1</span><span class="o">=</span><span class="n">cluster1</span><span class="p">,</span>
+                <span class="n">cluster2</span><span class="o">=</span><span class="n">cluster2</span><span class="p">,</span>
+                <span class="n">clusters</span><span class="o">=</span><span class="n">clusters</span><span class="p">,</span>
+                <span class="n">cluster_explanations</span><span class="o">=</span><span class="n">cluster_explanations</span><span class="p">,</span>
+                <span class="n">cluster_centroids</span><span class="o">=</span><span class="n">cluster_centroids</span><span class="p">,</span>
+                <span class="n">cluster_expl_actions</span><span class="o">=</span><span class="n">cluster_expl_actions</span><span class="p">,</span>
+                <span class="n">explanations_centroid</span><span class="o">=</span><span class="n">explanations_centroid</span><span class="p">,</span>
+                <span class="n">numerical_features_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">numerical_features_names</span><span class="p">,</span>
+                <span class="n">categorical_features_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">categorical_features_names</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">clusters_res</span><span class="p">,</span> <span class="n">total_eff</span><span class="p">,</span> <span class="n">total_cost</span> <span class="o">=</span> <span class="n">cluster_results</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">instances</span><span class="o">=</span><span class="n">instances</span><span class="p">,</span>
+            <span class="n">clusters</span><span class="o">=</span><span class="n">clusters</span><span class="p">,</span>
+            <span class="n">cluster_expl_actions</span><span class="o">=</span><span class="n">cluster_expl_actions</span><span class="p">,</span>
+            <span class="n">dist_func_dataframe</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dist_func_dataframe</span><span class="p">,</span>
+            <span class="n">numerical_features_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">numerical_features_names</span><span class="p">,</span>
+            <span class="n">categorical_features_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">categorical_features_names</span><span class="p">,</span>
+            <span class="n">cluster_action_choice_algo</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster_action_choice_algo</span><span class="p">,</span>
+            <span class="n">action_threshold</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">action_threshold</span><span class="p">,</span>
+            <span class="n">num_low_cost</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_low_cost</span><span class="p">,</span>
+            <span class="n">effectiveness_threshold</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">effectiveness_threshold</span><span class="p">,</span>
+            <span class="n">num_min_cost</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_cost_eff_thres_combinations__num_min_cost</span><span class="p">,</span>
+            <span class="n">max_n_actions_full_combinations</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eff_thres_hybrid__max_n_actions_full_combinations</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">stats</span> <span class="ow">in</span> <span class="n">clusters_res</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clusters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">format_glance_output</span><span class="p">(</span>
+                <span class="n">cluster_stats</span><span class="o">=</span><span class="n">clusters_res</span><span class="p">,</span>
+                <span class="n">categorical_columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">categorical_features_names</span><span class="p">)</span>
+<span class="c1">#             print_results(</span>
+<span class="c1">#                 clusters_stats=clusters_res,</span>
+<span class="c1">#                 total_effectiveness=total_eff,</span>
+<span class="c1">#                 total_cost=total_cost,</span>
+<span class="c1">#             )</span>
+            
+        <span class="n">eff</span><span class="p">,</span> <span class="n">cost</span> <span class="o">=</span> <span class="n">cumulative</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">instances</span><span class="p">,</span>
+            <span class="p">[</span><span class="n">stats</span><span class="p">[</span><span class="s2">&quot;action&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">stats</span> <span class="ow">in</span> <span class="n">clusters_res</span><span class="o">.</span><span class="n">items</span><span class="p">()],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dist_func_dataframe</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">numerical_features_names</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">categorical_features_names</span><span class="p">,</span>
+            <span class="s2">&quot;-&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span><span class="si">}</span><span class="s2">TOTAL EFFECTIVENESS:</span><span class="si">{</span><span class="n">Style</span><span class="o">.</span><span class="n">RESET_ALL</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">Fore</span><span class="o">.</span><span class="n">GREEN</span><span class="si">}{</span><span class="n">eff</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">instances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}{</span><span class="n">Fore</span><span class="o">.</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span><span class="si">}</span><span class="s2">TOTAL COST:</span><span class="si">{</span><span class="n">Style</span><span class="o">.</span><span class="n">RESET_ALL</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">Fore</span><span class="o">.</span><span class="n">MAGENTA</span><span class="si">}{</span><span class="p">(</span><span class="n">cost</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">eff</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}{</span><span class="n">Fore</span><span class="o">.</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_clustering</span> <span class="o">=</span> <span class="n">clusters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cluster_results</span> <span class="o">=</span> <span class="n">clusters_res</span>
+
+        <span class="k">return</span> <span class="n">eff</span><span class="p">,</span> <span class="n">cost</span></div>
+
+
+<div class="viewcode-block" id="C_GLANCE.global_actions">
+<a class="viewcode-back" href="../../../../../glance.iterative_merges.html#humancompatible.explain.glance.iterative_merges.iterative_merges.C_GLANCE.global_actions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">global_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">stats</span><span class="p">[</span><span class="s2">&quot;action&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">stats</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cluster_results</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="cumulative">
+<a class="viewcode-back" href="../../../../../glance.iterative_merges.html#humancompatible.explain.glance.iterative_merges.iterative_merges.cumulative">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cumulative</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">instances</span><span class="p">,</span>
+    <span class="n">actions</span><span class="p">,</span>
+    <span class="n">dist_func_dataframe</span><span class="p">,</span>
+    <span class="n">numeric_features_names</span><span class="p">,</span>
+    <span class="n">categorical_features_names</span><span class="p">,</span>
+    <span class="n">categorical_no_action_token</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the cumulative effectiveness and cost of applying a set of actions </span>
+<span class="sd">    to a given set of instances using a predictive model.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : Any</span>
+<span class="sd">        A predictive model with a predict method. This model will be used to predict </span>
+<span class="sd">        outcomes after applying actions to the input instances.</span>
+<span class="sd">    instances : pd.DataFrame</span>
+<span class="sd">        A DataFrame containing the instances for which actions are to be applied.</span>
+<span class="sd">    actions : List[dict]</span>
+<span class="sd">        A list of actions, where each action is represented as a dictionary that </span>
+<span class="sd">        specifies how to modify the instances.</span>
+<span class="sd">    dist_func_dataframe : Callable[[pd.DataFrame, pd.DataFrame], pd.Series]</span>
+<span class="sd">        A distance function that takes two DataFrames and returns a Series of distances </span>
+<span class="sd">        between corresponding rows.</span>
+<span class="sd">    numeric_features_names : List[str]</span>
+<span class="sd">        A list of names for the numeric features in the instances DataFrame.</span>
+<span class="sd">    categorical_features_names : List[str]</span>
+<span class="sd">        A list of names for the categorical features in the instances DataFrame.</span>
+<span class="sd">    categorical_no_action_token : Any</span>
+<span class="sd">        A token used to represent a no-action state for categorical features.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[int, float]</span>
+<span class="sd">        A tuple containing:</span>
+<span class="sd">        - effectiveness: An integer count of how many actions were effective (i.e., </span>
+<span class="sd">          resulted in a finite cost).</span>
+<span class="sd">        - cost: A float representing the total cost incurred by the effective actions. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">costs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">all_predictions</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">:</span>
+        <span class="n">applied_df</span> <span class="o">=</span> <span class="n">apply_action_pandas</span><span class="p">(</span>
+            <span class="n">instances</span><span class="p">,</span>
+            <span class="n">action</span><span class="p">,</span>
+            <span class="n">numeric_features_names</span><span class="p">,</span>
+            <span class="n">categorical_features_names</span><span class="p">,</span>
+            <span class="n">categorical_no_action_token</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">applied_df</span><span class="p">)</span>
+        <span class="n">all_predictions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
+        <span class="n">cur_costs</span> <span class="o">=</span> <span class="n">dist_func_dataframe</span><span class="p">(</span><span class="n">instances</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">applied_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="n">cur_costs</span><span class="p">[</span><span class="n">predictions</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="n">costs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_costs</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">costs</span> <span class="o">==</span> <span class="p">[]:</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.</span>
+    <span class="n">final_costs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span><span class="n">costs</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">effectiveness</span> <span class="o">=</span> <span class="p">(</span><span class="n">final_costs</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">cost</span> <span class="o">=</span> <span class="n">final_costs</span><span class="p">[</span><span class="n">final_costs</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">effectiveness</span><span class="p">,</span> <span class="n">cost</span></div>
+
+
+
+<div class="viewcode-block" id="action_fake_cost">
+<a class="viewcode-back" href="../../../../../glance.iterative_merges.html#humancompatible.explain.glance.iterative_merges.iterative_merges.action_fake_cost">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">action_fake_cost</span><span class="p">(</span>
+    <span class="n">action</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">numerical_features_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">categorical_features_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">action</span><span class="p">[</span><span class="n">numerical_features_names</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="o">+</span> <span class="p">(</span><span class="n">action</span><span class="p">[</span><span class="n">categorical_features_names</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_select_action_low_cost</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">instances</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">cluster_instances</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">candidate_actions</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">dist_func_dataframe</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">],</span>
+    <span class="n">numerical_features_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">categorical_features_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">action_threshold</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">num_low_cost</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">inv_total_clusters</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Selects the action with the lowest cost that flips a sufficient number of instances </span>
+<span class="sd">    in the given dataset, based on a predictive model.</span>
+
+<span class="sd">    This function evaluates candidate actions, applies them to the provided instances, </span>
+<span class="sd">    and calculates the number of predictions that were flipped as a result. It returns </span>
+<span class="sd">    the action that results in the lowest recourse cost while also meeting a specified </span>
+<span class="sd">    threshold of flipped predictions.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : Any</span>
+<span class="sd">        A machine learning model used for making predictions.</span>
+
+<span class="sd">    instances : pd.DataFrame</span>
+<span class="sd">        A DataFrame containing the instances for which counterfactuals are being generated.</span>
+
+<span class="sd">    cluster_instances : pd.DataFrame</span>
+<span class="sd">        A DataFrame containing instances from a specific cluster used for evaluating actions.</span>
+
+<span class="sd">    candidate_actions : pd.DataFrame</span>
+<span class="sd">        A DataFrame containing potential actions to apply to the instances.</span>
+
+<span class="sd">    dist_func_dataframe : Callable[[pd.DataFrame, pd.DataFrame], pd.Series]</span>
+<span class="sd">        A function that computes the distance or cost between two DataFrames.</span>
+
+<span class="sd">    numerical_features_names : List[str]</span>
+<span class="sd">        A list of names for the numerical features in the instances.</span>
+
+<span class="sd">    categorical_features_names : List[str]</span>
+<span class="sd">        A list of names for the categorical features in the instances.</span>
+
+<span class="sd">    action_threshold : int</span>
+<span class="sd">        The minimum ratio of flipped predictions to total instances required to consider </span>
+<span class="sd">        an action effective.</span>
+
+<span class="sd">    num_low_cost : int</span>
+<span class="sd">        The maximum number of low-cost actions to evaluate.</span>
+
+<span class="sd">    inv_total_clusters : int</span>
+<span class="sd">        The inverse of the total number of clusters used for normalization.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[int, float, pd.Series]</span>
+<span class="sd">        A tuple containing:</span>
+<span class="sd">        - The number of predictions flipped.</span>
+<span class="sd">        - The minimum recourse cost associated with the best action.</span>
+<span class="sd">        - The best action selected from the candidate actions.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If no actions are found that meet the effectiveness threshold.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">actions_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">action</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">candidate_actions</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()]</span>
+    <span class="n">actions_list</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span>
+        <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">action</span><span class="p">:</span> <span class="n">action_fake_cost</span><span class="p">(</span>
+            <span class="n">action</span><span class="p">,</span> <span class="n">numerical_features_names</span><span class="p">,</span> <span class="n">categorical_features_names</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">cf_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">actions_list</span><span class="p">[:</span> <span class="nb">min</span><span class="p">(</span><span class="n">num_low_cost</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">actions_list</span><span class="p">))]:</span>
+        <span class="n">cfs</span> <span class="o">=</span> <span class="n">apply_action_pandas</span><span class="p">(</span>
+            <span class="n">X</span><span class="o">=</span><span class="n">instances</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="n">action</span><span class="p">,</span>
+            <span class="n">numerical_columns</span><span class="o">=</span><span class="n">numerical_features_names</span><span class="p">,</span>
+            <span class="n">categorical_columns</span><span class="o">=</span><span class="n">categorical_features_names</span><span class="p">,</span>
+            <span class="n">categorical_no_action_token</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">predictions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">cfs</span><span class="p">)</span>
+        <span class="n">n_flipped</span> <span class="o">=</span> <span class="n">predictions</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">n_flipped</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">action_threshold</span> <span class="o">*</span> <span class="n">inv_total_clusters</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">instances</span><span class="p">):</span>
+            <span class="n">cfs</span> <span class="o">=</span> <span class="n">apply_action_pandas</span><span class="p">(</span>
+                <span class="n">X</span><span class="o">=</span><span class="n">cluster_instances</span><span class="p">,</span>
+                <span class="n">action</span><span class="o">=</span><span class="n">action</span><span class="p">,</span>
+                <span class="n">numerical_columns</span><span class="o">=</span><span class="n">numerical_features_names</span><span class="p">,</span>
+                <span class="n">categorical_columns</span><span class="o">=</span><span class="n">categorical_features_names</span><span class="p">,</span>
+                <span class="n">categorical_no_action_token</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">predictions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">cfs</span><span class="p">)</span>
+            <span class="n">n_flipped</span> <span class="o">=</span> <span class="n">predictions</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="n">factuals_flipped</span> <span class="o">=</span> <span class="n">cluster_instances</span><span class="p">[</span><span class="n">predictions</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">cfs_flipped</span> <span class="o">=</span> <span class="n">cfs</span><span class="p">[</span><span class="n">predictions</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">recourse_cost_sum</span> <span class="o">=</span> <span class="n">dist_func_dataframe</span><span class="p">(</span><span class="n">factuals_flipped</span><span class="p">,</span> <span class="n">cfs_flipped</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="n">cf_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">n_flipped</span><span class="p">,</span> <span class="n">recourse_cost_sum</span><span class="p">,</span> <span class="n">action</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cf_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Change action_threshold. No action found in cluster with effectiveness in all instances above the threshold&quot;</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n_flipped</span><span class="p">,</span> <span class="n">min_recourse_cost_sum</span><span class="p">,</span> <span class="n">best_action</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+            <span class="n">cf_list</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">n_flipped</span><span class="p">,</span> <span class="n">min_recourse_cost_sum</span><span class="p">,</span> <span class="n">best_action</span>
+
+<div class="viewcode-block" id="actions_cumulative_eff_cost">
+<a class="viewcode-back" href="../../../../../glance.iterative_merges.html#humancompatible.explain.glance.iterative_merges.iterative_merges.actions_cumulative_eff_cost">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">actions_cumulative_eff_cost</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">X</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">actions_with_costs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
+    <span class="n">dist_func_dataframe</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">],</span>
+    <span class="n">numerical_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">categorical_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">categorical_no_action_token</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Evaluates the cumulative effectiveness and cost of applying a sequence of actions </span>
+<span class="sd">    to a dataset using a predictive model.</span>
+
+<span class="sd">    This function applies each action from the sorted list of actions with their costs, </span>
+<span class="sd">    predicts the outcomes, and calculates the total number of predictions that were flipped </span>
+<span class="sd">    as well as the total recourse cost incurred from the actions.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : Any</span>
+<span class="sd">        A machine learning model used for making predictions on the modified instances.</span>
+
+<span class="sd">    X : pd.DataFrame</span>
+<span class="sd">        The original DataFrame of instances to which actions will be applied.</span>
+
+<span class="sd">    actions_with_costs : List[Tuple[pd.Series, float]]</span>
+<span class="sd">        A list of tuples where each tuple contains:</span>
+<span class="sd">        - A pandas Series representing the action to apply.</span>
+<span class="sd">        - A float representing the cost associated with the action.</span>
+
+<span class="sd">    dist_func_dataframe : Callable[[pd.DataFrame, pd.DataFrame], pd.Series]</span>
+<span class="sd">        A function that computes the distance or cost between two DataFrames.</span>
+
+<span class="sd">    numerical_columns : List[str]</span>
+<span class="sd">        A list of names for the numerical columns in the DataFrame.</span>
+
+<span class="sd">    categorical_columns : List[str]</span>
+<span class="sd">        A list of names for the categorical columns in the DataFrame.</span>
+
+<span class="sd">    categorical_no_action_token : Any</span>
+<span class="sd">        A token used to represent the absence of an action for categorical features.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[float, float]</span>
+<span class="sd">        A tuple containing:</span>
+<span class="sd">        - The total number of predictions flipped across all actions applied.</span>
+<span class="sd">        - The total recourse cost incurred from applying the actions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">actions_with_costs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">actions_with_costs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">n_flipped_total</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">recourse_cost_sum</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">action</span><span class="p">,</span> <span class="n">_old_cost</span> <span class="ow">in</span> <span class="n">actions_with_costs</span><span class="p">:</span>
+        <span class="n">cfs</span> <span class="o">=</span> <span class="n">apply_action_pandas</span><span class="p">(</span>
+            <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="n">action</span><span class="p">,</span>
+            <span class="n">numerical_columns</span><span class="o">=</span><span class="n">numerical_columns</span><span class="p">,</span>
+            <span class="n">categorical_columns</span><span class="o">=</span><span class="n">categorical_columns</span><span class="p">,</span>
+            <span class="n">categorical_no_action_token</span><span class="o">=</span><span class="n">categorical_no_action_token</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">predictions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">cfs</span><span class="p">)</span>
+        <span class="n">n_flipped_total</span> <span class="o">+=</span> <span class="n">predictions</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">factuals_flipped</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">predictions</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">cfs_flipped</span> <span class="o">=</span> <span class="n">cfs</span><span class="p">[</span><span class="n">predictions</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">recourse_cost_sum</span> <span class="o">+=</span> <span class="n">dist_func_dataframe</span><span class="p">(</span><span class="n">factuals_flipped</span><span class="p">,</span> <span class="n">cfs_flipped</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">predictions</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">n_flipped_total</span><span class="p">,</span> <span class="n">recourse_cost_sum</span></div>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_select_action_max_eff</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">instances</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">candidate_actions</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">dist_func_dataframe</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">],</span>
+    <span class="n">numerical_features_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">categorical_features_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">num_actions</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Selects actions based on maximizing the effectiveness.</span>
+
+<span class="sd">    This function evaluates a set of candidate actions by applying each action to the given</span>
+<span class="sd">    instances, predicting the outcomes, and calculating the number of predictions that are</span>
+<span class="sd">    flipped (changed from 0 to 1). It also computes the recourse cost associated with each action.</span>
+<span class="sd">    Depending on the number of actions specified, it returns either the best action or a list</span>
+<span class="sd">    of the top actions based on effectiveness.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : Any</span>
+<span class="sd">        A machine learning model used for making predictions on the modified instances.</span>
+
+<span class="sd">    instances : pd.DataFrame</span>
+<span class="sd">        The DataFrame of original instances to which actions will be applied.</span>
+
+<span class="sd">    candidate_actions : pd.DataFrame</span>
+<span class="sd">        A DataFrame containing the candidate actions to evaluate.</span>
+
+<span class="sd">    dist_func_dataframe : Callable[[pd.DataFrame, pd.DataFrame], pd.Series]</span>
+<span class="sd">        A function that computes the distance or cost between two DataFrames.</span>
+
+<span class="sd">    numerical_features_names : List[str]</span>
+<span class="sd">        A list of names for the numerical columns in the DataFrame.</span>
+
+<span class="sd">    categorical_features_names : List[str]</span>
+<span class="sd">        A list of names for the categorical columns in the DataFrame.</span>
+
+<span class="sd">    num_actions : int, optional</span>
+<span class="sd">        The number of top actions to select based on effectiveness. Defaults to 1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[int, int, pd.Series]</span>
+<span class="sd">        If `num_actions` is 1, returns:</span>
+<span class="sd">        - The maximum number of predictions flipped.</span>
+<span class="sd">        - The total recourse cost associated with the best action.</span>
+<span class="sd">        - The best action (pd.Series).</span>
+<span class="sd">        </span>
+<span class="sd">        If `num_actions` &gt; 1, returns a list of the top actions based on their effectiveness.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">max_n_flipped</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">cf_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">candidate_actions</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">cfs</span> <span class="o">=</span> <span class="n">apply_action_pandas</span><span class="p">(</span>
+            <span class="n">X</span><span class="o">=</span><span class="n">instances</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="n">action</span><span class="p">,</span>
+            <span class="n">numerical_columns</span><span class="o">=</span><span class="n">numerical_features_names</span><span class="p">,</span>
+            <span class="n">categorical_columns</span><span class="o">=</span><span class="n">categorical_features_names</span><span class="p">,</span>
+            <span class="n">categorical_no_action_token</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">predictions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">cfs</span><span class="p">)</span>
+        <span class="n">n_flipped</span> <span class="o">=</span> <span class="n">predictions</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">n_flipped</span> <span class="o">&lt;</span> <span class="n">max_n_flipped</span> <span class="ow">and</span> <span class="n">num_actions</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">max_n_flipped</span> <span class="o">=</span> <span class="n">n_flipped</span>
+
+        <span class="n">factuals_flipped</span> <span class="o">=</span> <span class="n">instances</span><span class="p">[</span><span class="n">predictions</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">cfs_flipped</span> <span class="o">=</span> <span class="n">cfs</span><span class="p">[</span><span class="n">predictions</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">recourse_cost_sum</span> <span class="o">=</span> <span class="n">dist_func_dataframe</span><span class="p">(</span><span class="n">factuals_flipped</span><span class="p">,</span> <span class="n">cfs_flipped</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">cf_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">n_flipped</span><span class="p">,</span> <span class="n">recourse_cost_sum</span><span class="p">,</span> <span class="n">action</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">num_actions</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">max_n_flipped</span><span class="p">,</span> <span class="n">recourse_cost_sum</span><span class="p">,</span> <span class="n">best_action</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="n">cf_list</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">max_n_flipped</span><span class="p">,</span> <span class="n">recourse_cost_sum</span><span class="p">,</span> <span class="n">best_action</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cf_list</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">cf_list</span><span class="p">[:</span><span class="n">num_actions</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_select_action_mean</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">instances</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">candidate_actions</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">dist_func_dataframe</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">],</span>
+    <span class="n">numerical_features_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">categorical_features_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Selects the mean action from a set of candidate actions and evaluates its effectiveness.</span>
+
+<span class="sd">    This function computes the mean action from the candidate actions and applies it to the</span>
+<span class="sd">    given instances. It then predicts the outcomes and calculates the number of predictions that</span>
+<span class="sd">    are flipped (changed from 0 to 1) as well as the associated recourse cost.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : Any</span>
+<span class="sd">        A machine learning model used for making predictions on the modified instances.</span>
+
+<span class="sd">    instances : pd.DataFrame</span>
+<span class="sd">        The DataFrame of original instances to which the mean action will be applied.</span>
+
+<span class="sd">    candidate_actions : pd.DataFrame</span>
+<span class="sd">        A DataFrame containing the candidate actions from which the mean action will be derived.</span>
+
+<span class="sd">    dist_func_dataframe : Callable[[pd.DataFrame, pd.DataFrame], pd.Series]</span>
+<span class="sd">        A function that computes the distance or cost between two DataFrames.</span>
+
+<span class="sd">    numerical_features_names : List[str]</span>
+<span class="sd">        A list of names for the numerical columns in the DataFrame.</span>
+
+<span class="sd">    categorical_features_names : List[str]</span>
+<span class="sd">        A list of names for the categorical columns in the DataFrame.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[int, int, pd.Series]</span>
+<span class="sd">        A tuple containing:</span>
+<span class="sd">        - The number of predictions flipped by applying the mean action.</span>
+<span class="sd">        - The total recourse cost associated with the mean action.</span>
+<span class="sd">        - The mean action (pd.Series).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mean_action</span> <span class="o">=</span> <span class="n">actions_mean_pandas</span><span class="p">(</span>
+        <span class="n">actions</span><span class="o">=</span><span class="n">candidate_actions</span><span class="p">,</span>
+        <span class="n">numerical_features</span><span class="o">=</span><span class="n">numerical_features_names</span><span class="p">,</span>
+        <span class="n">categorical_features</span><span class="o">=</span><span class="n">categorical_features_names</span><span class="p">,</span>
+        <span class="n">categorical_no_action_token</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">cfs</span> <span class="o">=</span> <span class="n">apply_action_pandas</span><span class="p">(</span>
+        <span class="n">X</span><span class="o">=</span><span class="n">instances</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="n">mean_action</span><span class="p">,</span>
+        <span class="n">numerical_columns</span><span class="o">=</span><span class="n">numerical_features_names</span><span class="p">,</span>
+        <span class="n">categorical_columns</span><span class="o">=</span><span class="n">categorical_features_names</span><span class="p">,</span>
+        <span class="n">categorical_no_action_token</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">predictions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">cfs</span><span class="p">)</span>
+    <span class="n">n_flipped</span> <span class="o">=</span> <span class="n">predictions</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">factuals_flipped</span> <span class="o">=</span> <span class="n">instances</span><span class="p">[</span><span class="n">predictions</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">cfs_flipped</span> <span class="o">=</span> <span class="n">cfs</span><span class="p">[</span><span class="n">predictions</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">recourse_cost_sum</span> <span class="o">=</span> <span class="n">dist_func_dataframe</span><span class="p">(</span><span class="n">factuals_flipped</span><span class="p">,</span> <span class="n">cfs_flipped</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">n_flipped</span><span class="p">,</span> <span class="n">recourse_cost_sum</span><span class="p">,</span> <span class="n">mean_action</span>
+
+
+<div class="viewcode-block" id="cluster_results">
+<a class="viewcode-back" href="../../../../../glance.iterative_merges.html#humancompatible.explain.glance.iterative_merges.iterative_merges.cluster_results">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cluster_results</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">instances</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">clusters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="n">cluster_expl_actions</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="n">dist_func_dataframe</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">],</span>
+    <span class="n">numerical_features_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">categorical_features_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">cluster_action_choice_algo</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;max-eff&quot;</span><span class="p">,</span> <span class="s2">&quot;mean-act&quot;</span><span class="p">,</span> <span class="s2">&quot;low-cost&quot;</span><span class="p">,</span> <span class="s2">&quot;min-cost-eff-thres&quot;</span><span class="p">,</span> <span class="s2">&quot;eff-thres-hybrid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;max-eff&quot;</span><span class="p">,</span>
+    <span class="n">action_threshold</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">num_low_cost</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="n">effectiveness_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">num_min_cost</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_n_actions_full_combinations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Evaluates and selects actions for each cluster based on a specified action choice algorithm.</span>
+
+<span class="sd">    This function iterates through each cluster of instances, applying the specified algorithm to </span>
+<span class="sd">    select the best action for achieving recourse while minimizing costs. It calculates the total </span>
+<span class="sd">    effectiveness and mean recourse costs across all clusters.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : Any</span>
+<span class="sd">        A machine learning model used for making predictions on modified instances.</span>
+
+<span class="sd">    instances : pd.DataFrame</span>
+<span class="sd">        The DataFrame of original instances to which actions will be applied.</span>
+
+<span class="sd">    clusters : Dict[int, pd.DataFrame]</span>
+<span class="sd">        A dictionary mapping cluster IDs to DataFrames of instances belonging to each cluster.</span>
+
+<span class="sd">    cluster_expl_actions : Dict[int, pd.DataFrame]</span>
+<span class="sd">        A dictionary mapping cluster IDs to DataFrames of candidate actions for each cluster.</span>
+
+<span class="sd">    dist_func_dataframe : Callable[[pd.DataFrame, pd.DataFrame], pd.Series]</span>
+<span class="sd">        A function that computes the distance or cost between two DataFrames.</span>
+
+<span class="sd">    numerical_features_names : List[str]</span>
+<span class="sd">        A list of names for the numerical columns in the DataFrames.</span>
+
+<span class="sd">    categorical_features_names : List[str]</span>
+<span class="sd">        A list of names for the categorical columns in the DataFrames.</span>
+
+<span class="sd">    cluster_action_choice_algo : Literal[&quot;max-eff&quot;, &quot;mean-act&quot;, &quot;low-cost&quot;, &quot;min-cost-eff-thres&quot;, &quot;eff-thres-hybrid&quot;]</span>
+<span class="sd">        The algorithm to use for selecting actions from candidate actions. Options include:</span>
+<span class="sd">        - &quot;max-eff&quot;: Select the action with maximum effectiveness.</span>
+<span class="sd">        - &quot;mean-act&quot;: Select the mean action from candidate actions.</span>
+<span class="sd">        - &quot;low-cost&quot;: Select actions based on low cost.</span>
+
+<span class="sd">    action_threshold : int</span>
+<span class="sd">        Minimum threshold for the number of flipped predictions required to consider an action effective.</span>
+
+<span class="sd">    num_low_cost : int</span>
+<span class="sd">        The number of low-cost actions to consider (used when the low-cost algorithm is selected).</span>
+
+<span class="sd">    effectiveness_threshold : float</span>
+<span class="sd">        Minimum effectiveness required for actions (used when the min-cost-eff-thres algorithm is selected).</span>
+
+<span class="sd">    num_min_cost : Optional[int]</span>
+<span class="sd">        Number of minimum cost actions to consider (used when the min-cost-eff-thres algorithm is selected).</span>
+
+<span class="sd">    max_n_actions_full_combinations : int</span>
+<span class="sd">        Maximum number of actions to evaluate in full combinations (not currently used in the function).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[Dict[int, Dict[str, Any]], float, float]</span>
+<span class="sd">        A tuple containing:</span>
+<span class="sd">        - A dictionary where each key is a cluster ID and each value is another dictionary with the selected action, its effectiveness, and cost.</span>
+<span class="sd">        - Total effectiveness percentage across all clusters.</span>
+<span class="sd">        - Total mean recourse cost across all clusters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_flipped_total</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">total_recourse_cost_sum</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">ret_clusters</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="n">clusters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">cluster_action_choice_algo</span> <span class="o">==</span> <span class="s2">&quot;max-eff&quot;</span><span class="p">:</span>
+            <span class="n">n_flipped</span><span class="p">,</span> <span class="n">recourse_cost_sum</span><span class="p">,</span> <span class="n">selected_action</span> <span class="o">=</span> <span class="n">_select_action_max_eff</span><span class="p">(</span>
+                <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                <span class="n">instances</span><span class="o">=</span><span class="n">cluster</span><span class="p">,</span>
+                <span class="n">candidate_actions</span><span class="o">=</span><span class="n">cluster_expl_actions</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="n">dist_func_dataframe</span><span class="o">=</span><span class="n">dist_func_dataframe</span><span class="p">,</span>
+                <span class="n">numerical_features_names</span><span class="o">=</span><span class="n">numerical_features_names</span><span class="p">,</span>
+                <span class="n">categorical_features_names</span><span class="o">=</span><span class="n">categorical_features_names</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cluster_action_choice_algo</span> <span class="o">==</span> <span class="s2">&quot;mean-act&quot;</span><span class="p">:</span>
+            <span class="n">n_flipped</span><span class="p">,</span> <span class="n">recourse_cost_sum</span><span class="p">,</span> <span class="n">selected_action</span> <span class="o">=</span> <span class="n">_select_action_mean</span><span class="p">(</span>
+                <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                <span class="n">instances</span><span class="o">=</span><span class="n">cluster</span><span class="p">,</span>
+                <span class="n">candidate_actions</span><span class="o">=</span><span class="n">cluster_expl_actions</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="n">dist_func_dataframe</span><span class="o">=</span><span class="n">dist_func_dataframe</span><span class="p">,</span>
+                <span class="n">numerical_features_names</span><span class="o">=</span><span class="n">numerical_features_names</span><span class="p">,</span>
+                <span class="n">categorical_features_names</span><span class="o">=</span><span class="n">categorical_features_names</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cluster_action_choice_algo</span> <span class="o">==</span> <span class="s2">&quot;low-cost&quot;</span><span class="p">:</span>
+            <span class="n">n_flipped</span><span class="p">,</span> <span class="n">recourse_cost_sum</span><span class="p">,</span> <span class="n">selected_action</span> <span class="o">=</span> <span class="n">_select_action_low_cost</span><span class="p">(</span>
+                <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                <span class="n">instances</span><span class="o">=</span><span class="n">instances</span><span class="p">,</span>
+                <span class="n">cluster_instances</span><span class="o">=</span><span class="n">cluster</span><span class="p">,</span>
+                <span class="n">candidate_actions</span><span class="o">=</span><span class="n">cluster_expl_actions</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="n">dist_func_dataframe</span><span class="o">=</span><span class="n">dist_func_dataframe</span><span class="p">,</span>
+                <span class="n">numerical_features_names</span><span class="o">=</span><span class="n">numerical_features_names</span><span class="p">,</span>
+                <span class="n">categorical_features_names</span><span class="o">=</span><span class="n">categorical_features_names</span><span class="p">,</span>
+                <span class="n">action_threshold</span><span class="o">=</span><span class="n">action_threshold</span><span class="p">,</span>
+                <span class="n">num_low_cost</span><span class="o">=</span><span class="n">num_low_cost</span><span class="p">,</span>
+                <span class="n">inv_total_clusters</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">clusters</span><span class="p">)),</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cluster_action_choice_algo</span> <span class="o">==</span> <span class="s2">&quot;min-cost-eff-thres-combinations&quot;</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="k">elif</span> <span class="n">cluster_action_choice_algo</span> <span class="o">==</span> <span class="s2">&quot;eff-thres-hybrid&quot;</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Unsupported algorithm for choice of final action for each cluster&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">ret_clusters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="n">selected_action</span><span class="p">,</span>
+            <span class="s2">&quot;effectiveness&quot;</span><span class="p">:</span> <span class="n">n_flipped</span> <span class="o">/</span> <span class="n">cluster</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="s2">&quot;cost&quot;</span><span class="p">:</span> <span class="n">recourse_cost_sum</span> <span class="o">/</span> <span class="n">n_flipped</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">n_flipped_total</span> <span class="o">+=</span> <span class="n">n_flipped</span>
+        <span class="n">total_recourse_cost_sum</span> <span class="o">+=</span> <span class="n">recourse_cost_sum</span>
+
+    
+    <span class="k">if</span> <span class="n">cluster_action_choice_algo</span> <span class="o">==</span> <span class="s2">&quot;min-cost-eff-thres-combinations&quot;</span><span class="p">:</span>
+        <span class="n">n_flipped_total</span><span class="p">,</span> <span class="n">total_recourse_cost_sum</span><span class="p">,</span> <span class="n">action_set</span> <span class="o">=</span> <span class="n">_select_action_min_cost_eff_thres_combinations</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">instances</span><span class="o">=</span><span class="n">instances</span><span class="p">,</span>
+            <span class="n">clusters</span><span class="o">=</span><span class="n">clusters</span><span class="p">,</span>
+            <span class="n">candidate_actions</span><span class="o">=</span><span class="n">cluster_expl_actions</span><span class="p">,</span>
+            <span class="n">dist_func_dataframe</span><span class="o">=</span><span class="n">dist_func_dataframe</span><span class="p">,</span>
+            <span class="n">numerical_features_names</span><span class="o">=</span><span class="n">numerical_features_names</span><span class="p">,</span>
+            <span class="n">categorical_features_names</span><span class="o">=</span><span class="n">categorical_features_names</span><span class="p">,</span>
+            <span class="n">effectiveness_threshold</span><span class="o">=</span><span class="n">effectiveness_threshold</span><span class="p">,</span>
+            <span class="n">num_min_cost</span><span class="o">=</span><span class="n">num_min_cost</span><span class="p">,</span>
+        <span class="p">)</span>
+        
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">action_set</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
+        <span class="n">actions_iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">action_set</span><span class="p">)</span>
+        <span class="n">ret_clusters</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="nb">next</span><span class="p">(</span><span class="n">actions_iter</span><span class="p">),</span>
+            <span class="s2">&quot;effectiveness&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="s2">&quot;cost&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+        <span class="p">}</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">clusters</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+        
+        <span class="n">n_individuals_total</span> <span class="o">=</span> <span class="n">instances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">total_effectiveness_percentage</span> <span class="o">=</span> <span class="n">n_flipped_total</span> <span class="o">/</span> <span class="n">n_individuals_total</span>
+        <span class="n">total_mean_recourse_cost</span> <span class="o">=</span> <span class="n">total_recourse_cost_sum</span> <span class="o">/</span> <span class="n">n_flipped_total</span>
+        
+        <span class="k">return</span> <span class="n">ret_clusters</span><span class="p">,</span> <span class="n">total_effectiveness_percentage</span><span class="p">,</span> <span class="n">total_mean_recourse_cost</span>
+        
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">action_set</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
+        <span class="n">actions_iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">action_set</span><span class="p">)</span>
+        <span class="n">ret_clusters</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="nb">next</span><span class="p">(</span><span class="n">actions_iter</span><span class="p">),</span>
+            <span class="s2">&quot;effectiveness&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="s2">&quot;cost&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+        <span class="p">}</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">clusters</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+        
+        <span class="n">n_individuals_total</span> <span class="o">=</span> <span class="n">instances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">total_effectiveness_percentage</span> <span class="o">=</span> <span class="n">n_flipped_total</span> <span class="o">/</span> <span class="n">n_individuals_total</span>
+        <span class="n">total_mean_recourse_cost</span> <span class="o">=</span> <span class="n">total_recourse_cost_sum</span> <span class="o">/</span> <span class="n">n_flipped_total</span>
+        
+        <span class="k">return</span> <span class="n">ret_clusters</span><span class="p">,</span> <span class="n">total_effectiveness_percentage</span><span class="p">,</span> <span class="n">total_mean_recourse_cost</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n_individuals_total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">cluster</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="n">clusters</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+        <span class="n">total_effectiveness_percentage</span> <span class="o">=</span> <span class="n">n_flipped_total</span> <span class="o">/</span> <span class="n">n_individuals_total</span>
+        <span class="n">total_mean_recourse_cost</span> <span class="o">=</span> <span class="n">total_recourse_cost_sum</span> <span class="o">/</span> <span class="n">n_flipped_total</span>
+        <span class="k">return</span> <span class="n">ret_clusters</span><span class="p">,</span> <span class="n">total_effectiveness_percentage</span><span class="p">,</span> <span class="n">total_mean_recourse_cost</span></div>
+
+
+
+<div class="viewcode-block" id="print_results">
+<a class="viewcode-back" href="../../../../../glance.iterative_merges.html#humancompatible.explain.glance.iterative_merges.iterative_merges.print_results">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_results</span><span class="p">(</span>
+    <span class="n">clusters_stats</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">]],</span>
+    <span class="n">total_effectiveness</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">total_cost</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prints the statistics for each cluster, including effectiveness and cost.</span>
+
+<span class="sd">    This function takes the results of cluster analysis and formats them for easy </span>
+<span class="sd">    viewing. It displays the size of each cluster, the actions taken, and the </span>
+<span class="sd">    effectiveness and cost of those actions.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    clusters_stats : Dict[int, Dict[str, numbers.Number]]</span>
+<span class="sd">        A dictionary where keys are cluster IDs (integers) and values are </span>
+<span class="sd">        dictionaries containing statistics for each cluster. Each value dictionary</span>
+<span class="sd">        must contain the following keys:</span>
+<span class="sd">            - &quot;size&quot;: The size of the cluster.</span>
+<span class="sd">            - &quot;action&quot;: The actions taken for the cluster.</span>
+<span class="sd">            - &quot;effectiveness&quot;: The effectiveness of the actions in the cluster.</span>
+<span class="sd">            - &quot;cost&quot;: The cost associated with the actions.</span>
+
+<span class="sd">    total_effectiveness : float</span>
+<span class="sd">        The total effectiveness percentage across all clusters, represented as a decimal </span>
+<span class="sd">        (e.g., 0.75 for 75%).</span>
+
+<span class="sd">    total_cost : float</span>
+<span class="sd">        The total cost associated with the actions taken across all clusters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">stats</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">clusters_stats</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CLUSTER </span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> with size </span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+        <span class="n">display</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">stats</span><span class="p">[</span><span class="s2">&quot;action&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Effectiveness: </span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;effectiveness&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">, Cost: </span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;cost&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="format_glance_output">
+<a class="viewcode-back" href="../../../../../glance.iterative_merges.html#humancompatible.explain.glance.iterative_merges.iterative_merges.format_glance_output">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">format_glance_output</span><span class="p">(</span>
+    <span class="n">cluster_stats</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">]],</span>
+    <span class="n">categorical_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<span class="p">):</span>
+    <span class="n">cluster_res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cluster_stats</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span><span class="n">row</span> <span class="ow">in</span> <span class="n">cluster_res</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="c1">#     print(f&quot;{Style.BRIGHT}CLUSTER {index+1}{Style.RESET_ALL} with size {row[&#39;size&#39;]}&quot;)</span>
+        <span class="n">output_string</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span><span class="si">}</span><span class="s2">Action </span><span class="si">{</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="si">{</span><span class="n">Style</span><span class="o">.</span><span class="n">RESET_ALL</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">for</span> <span class="n">column_name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;action&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">column_name</span> <span class="ow">in</span> <span class="n">categorical_columns</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+                    <span class="n">output_string</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span><span class="si">}{</span><span class="n">column_name</span><span class="si">}{</span><span class="n">Style</span><span class="o">.</span><span class="n">RESET_ALL</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">Fore</span><span class="o">.</span><span class="n">RED</span><span class="si">}{</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">Fore</span><span class="o">.</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">:</span>
+                        <span class="n">output_string</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span><span class="si">}{</span><span class="n">column_name</span><span class="si">}{</span><span class="n">Style</span><span class="o">.</span><span class="n">RESET_ALL</span><span class="si">}</span><span class="s2"> +</span><span class="si">{</span><span class="n">Fore</span><span class="o">.</span><span class="n">RED</span><span class="si">}{</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">Fore</span><span class="o">.</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="k">elif</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">:</span>
+                        <span class="n">output_string</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span><span class="si">}{</span><span class="n">column_name</span><span class="si">}{</span><span class="n">Style</span><span class="o">.</span><span class="n">RESET_ALL</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">Fore</span><span class="o">.</span><span class="n">RED</span><span class="si">}{</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">Fore</span><span class="o">.</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">output_string</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span><span class="si">}</span><span class="s2">Effectiveness:</span><span class="si">{</span><span class="n">Style</span><span class="o">.</span><span class="n">RESET_ALL</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">Fore</span><span class="o">.</span><span class="n">GREEN</span><span class="si">}{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;effectiveness&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}{</span><span class="n">Fore</span><span class="o">.</span><span class="n">RESET</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span><span class="si">}</span><span class="s2">Cost:</span><span class="si">{</span><span class="n">Style</span><span class="o">.</span><span class="n">RESET_ALL</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">Fore</span><span class="o">.</span><span class="n">MAGENTA</span><span class="si">}{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;cost&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}{</span><span class="n">Fore</span><span class="o">.</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+        
+<span class="k">def</span><span class="w"> </span><span class="nf">_merge_clusters</span><span class="p">(</span>
+    <span class="n">cluster1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">cluster2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">clusters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="n">cluster_explanations</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="n">cluster_centroids</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="n">cluster_expl_actions</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="n">explanations_centroid</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="n">numerical_features_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">categorical_features_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Merges two clusters into one and updates all associated data structures.</span>
+
+<span class="sd">    This function takes two cluster identifiers and combines their respective data.</span>
+<span class="sd">    It updates the clusters, explanations, centroids, and action dataframes accordingly.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cluster1 : int</span>
+<span class="sd">        The identifier for the first cluster to merge.</span>
+
+<span class="sd">    cluster2 : int</span>
+<span class="sd">        The identifier for the second cluster to merge into.</span>
+
+<span class="sd">    clusters : Dict[int, pd.DataFrame]</span>
+<span class="sd">        A dictionary mapping cluster IDs to their respective dataframes.</span>
+
+<span class="sd">    cluster_explanations : Dict[int, pd.DataFrame]</span>
+<span class="sd">        A dictionary mapping cluster IDs to their explanations dataframes.</span>
+
+<span class="sd">    cluster_centroids : Dict[int, pd.DataFrame]</span>
+<span class="sd">        A dictionary mapping cluster IDs to their centroid dataframes.</span>
+
+<span class="sd">    cluster_expl_actions : Dict[int, pd.DataFrame]</span>
+<span class="sd">        A dictionary mapping cluster IDs to their explanation actions dataframes.</span>
+
+<span class="sd">    explanations_centroid : Dict[int, pd.DataFrame]</span>
+<span class="sd">        A dictionary mapping cluster IDs to their centroid explanations dataframes.</span>
+
+<span class="sd">    numerical_features_names : List[str]</span>
+<span class="sd">        A list of names for the numerical features in the dataset.</span>
+
+<span class="sd">    categorical_features_names : List[str]</span>
+<span class="sd">        A list of names for the categorical features in the dataset.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">clusters</span><span class="p">[</span><span class="n">cluster2</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">clusters</span><span class="p">[</span><span class="n">cluster2</span><span class="p">],</span> <span class="n">clusters</span><span class="p">[</span><span class="n">cluster1</span><span class="p">]],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="k">del</span> <span class="n">clusters</span><span class="p">[</span><span class="n">cluster1</span><span class="p">]</span>
+
+    <span class="n">cluster_explanations</span><span class="p">[</span><span class="n">cluster2</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">cluster_explanations</span><span class="p">[</span><span class="n">cluster2</span><span class="p">],</span> <span class="n">cluster_explanations</span><span class="p">[</span><span class="n">cluster1</span><span class="p">]],</span>
+        <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">del</span> <span class="n">cluster_explanations</span><span class="p">[</span><span class="n">cluster1</span><span class="p">]</span>
+
+    <span class="n">explanations_centroid</span><span class="p">[</span><span class="n">cluster2</span><span class="p">]</span> <span class="o">=</span> <span class="n">centroid_pandas</span><span class="p">(</span>
+        <span class="n">cluster_explanations</span><span class="p">[</span><span class="n">cluster2</span><span class="p">],</span>
+        <span class="n">numerical_columns</span><span class="o">=</span><span class="n">numerical_features_names</span><span class="p">,</span>
+        <span class="n">categorical_columns</span><span class="o">=</span><span class="n">categorical_features_names</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">del</span> <span class="n">explanations_centroid</span><span class="p">[</span><span class="n">cluster1</span><span class="p">]</span>
+
+    <span class="n">cluster_expl_actions</span><span class="p">[</span><span class="n">cluster2</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">cluster_expl_actions</span><span class="p">[</span><span class="n">cluster2</span><span class="p">],</span> <span class="n">cluster_expl_actions</span><span class="p">[</span><span class="n">cluster1</span><span class="p">]],</span>
+        <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">del</span> <span class="n">cluster_expl_actions</span><span class="p">[</span><span class="n">cluster1</span><span class="p">]</span>
+
+    <span class="n">cluster_centroids</span><span class="p">[</span><span class="n">cluster2</span><span class="p">]</span> <span class="o">=</span> <span class="n">centroid_pandas</span><span class="p">(</span>
+        <span class="n">clusters</span><span class="p">[</span><span class="n">cluster2</span><span class="p">],</span>
+        <span class="n">numerical_columns</span><span class="o">=</span><span class="n">numerical_features_names</span><span class="p">,</span>
+        <span class="n">categorical_columns</span><span class="o">=</span><span class="n">categorical_features_names</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">del</span> <span class="n">cluster_centroids</span><span class="p">[</span><span class="n">cluster1</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_find_candidate_clusters</span><span class="p">(</span>
+    <span class="n">clusters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="n">cluster_centroids</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="n">explanations_centroid</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="n">heuristic_weights</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="n">dist_func_dataframe</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Identifies the best candidate clusters for merging based on distances of centroids</span>
+<span class="sd">    and explanation centroids, weighted by given heuristic values.</span>
+
+<span class="sd">    The function selects the smallest cluster and calculates distances to all other clusters&#39; centroids.</span>
+<span class="sd">    It uses these distances to determine a heuristic value for potential merges, returning the two </span>
+<span class="sd">    clusters with the best merge heuristic.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    clusters : Dict[int, pd.DataFrame]</span>
+<span class="sd">        A dictionary mapping cluster IDs to their respective dataframes.</span>
+
+<span class="sd">    cluster_centroids : Dict[int, pd.DataFrame]</span>
+<span class="sd">        A dictionary mapping cluster IDs to their centroid dataframes.</span>
+
+<span class="sd">    explanations_centroid : Dict[int, pd.DataFrame]</span>
+<span class="sd">        A dictionary mapping cluster IDs to their explanation centroids.</span>
+
+<span class="sd">    heuristic_weights : Tuple[float, float]</span>
+<span class="sd">        A tuple containing two weights used to combine centroid distances and explanation centroid distances.</span>
+
+<span class="sd">    dist_func_dataframe : Callable[[pd.DataFrame, pd.DataFrame], pd.Series]</span>
+<span class="sd">        A function that computes the distance between two dataframes, returning a series of distances.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[int, int]</span>
+<span class="sd">        A tuple containing the IDs of the two candidate clusters identified for merging.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">clusters_idx</span> <span class="o">=</span> <span class="n">clusters</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+    <span class="n">smallest_cluster</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">clusters_idx</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="p">(</span><span class="n">clusters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i</span><span class="p">))</span>
+    <span class="n">smallest_expl_centroid_repeat</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">explanations_centroid</span><span class="p">[</span><span class="n">smallest_cluster</span><span class="p">]]</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">expl_centroids_rest</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">explanations_centroid</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">clusters_idx</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">smallest_cluster</span><span class="p">],</span>
+        <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">explanations_centroid_distances</span> <span class="o">=</span> <span class="n">dist_func_dataframe</span><span class="p">(</span>
+        <span class="n">smallest_expl_centroid_repeat</span><span class="p">,</span>
+        <span class="n">expl_centroids_rest</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">smallest_centroid_repeat</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">cluster_centroids</span><span class="p">[</span><span class="n">smallest_cluster</span><span class="p">]]</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="n">centroids_rest</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">cluster_centroids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">clusters_idx</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">smallest_cluster</span><span class="p">],</span>
+        <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">cluster_centroids_distances</span> <span class="o">=</span> <span class="n">dist_func_dataframe</span><span class="p">(</span>
+        <span class="n">smallest_centroid_repeat</span><span class="p">,</span>
+        <span class="n">centroids_rest</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">merge_heuristic_values</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">heuristic_weights</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">cluster_centroids_distances</span>
+        <span class="o">+</span> <span class="n">heuristic_weights</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">explanations_centroid_distances</span>
+    <span class="p">)</span>
+    <span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">smallest_cluster</span><span class="p">,</span> <span class="n">cluster1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">cluster1</span> <span class="ow">in</span> <span class="n">clusters_idx</span>
+        <span class="k">if</span> <span class="n">cluster1</span> <span class="o">!=</span> <span class="n">smallest_cluster</span>
+    <span class="p">]</span>
+    <span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">merge_heuristic_values</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">candidates</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">candidates</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="k">return</span> <span class="n">candidates</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">candidates</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_generate_clusters</span><span class="p">(</span>
+    <span class="n">instances</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">num_clusters</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">categorical_features_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">clustering_method</span><span class="p">:</span> <span class="n">ClusteringMethod</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates clusters from the given instances using the specified clustering method.</span>
+
+<span class="sd">    The function applies one-hot encoding to the categorical features in the input data,</span>
+<span class="sd">    fits the provided clustering method, and assigns instances to clusters. It returns </span>
+<span class="sd">    a dictionary mapping cluster IDs to their respective dataframes.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    instances : pd.DataFrame</span>
+<span class="sd">        The input data containing instances to be clustered.</span>
+
+<span class="sd">    num_clusters : int</span>
+<span class="sd">        The desired number of clusters to generate. Note that the actual number of </span>
+<span class="sd">        clusters may vary depending on the clustering method used.</span>
+
+<span class="sd">    categorical_features_names : List[str]</span>
+<span class="sd">        A list of names of categorical features in the input data that need to be </span>
+<span class="sd">        one-hot encoded for clustering.</span>
+
+<span class="sd">    clustering_method : ClusteringMethod</span>
+<span class="sd">        An instance of a clustering method (e.g., KMeans, DBSCAN) that implements </span>
+<span class="sd">        the fit and predict methods.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    -------</span>
+<span class="sd">    Dict[int, pd.DataFrame]</span>
+<span class="sd">        A dictionary where the keys are cluster IDs and the values are dataframes </span>
+<span class="sd">        containing the instances assigned to each cluster.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ohe_instances</span> <span class="o">=</span> <span class="n">_one_hot_encode</span><span class="p">(</span><span class="n">instances</span><span class="p">,</span> <span class="n">categorical_features_names</span><span class="p">)</span>
+    <span class="n">clustering_method</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ohe_instances</span><span class="p">)</span>
+    <span class="n">assigned_clusters</span> <span class="o">=</span> <span class="n">clustering_method</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">ohe_instances</span><span class="p">)</span>
+
+    <span class="n">cluster_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">assigned_clusters</span><span class="p">)</span>
+    <span class="n">cluster_ids</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="n">clusters</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">instances</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">assigned_clusters</span> <span class="o">==</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cluster_ids</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">clusters</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_one_hot_encode</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">categorical_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies one-hot encoding to the specified categorical columns of a DataFrame.</span>
+
+<span class="sd">    This function transforms categorical columns in the input DataFrame into </span>
+<span class="sd">    a one-hot encoded format, allowing them to be used in machine learning models. </span>
+<span class="sd">    The non-categorical columns are retained in their original form.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : pd.DataFrame</span>
+<span class="sd">        The input DataFrame containing the data with both categorical and numerical features.</span>
+
+<span class="sd">    categorical_columns : List[str]</span>
+<span class="sd">        A list of names of the categorical columns in the DataFrame that should be one-hot encoded.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.DataFrame</span>
+<span class="sd">        A new DataFrame where the specified categorical columns have been one-hot encoded, </span>
+<span class="sd">        and all other columns are retained as is.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">transformer</span> <span class="o">=</span> <span class="n">ColumnTransformer</span><span class="p">(</span>
+        <span class="p">[(</span><span class="s2">&quot;ohe&quot;</span><span class="p">,</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">categorical_columns</span><span class="p">)],</span>
+        <span class="n">remainder</span><span class="o">=</span><span class="s2">&quot;passthrough&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">transformer</span><span class="o">.</span><span class="n">get_feature_names_out</span><span class="p">())</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, AutoFair Project.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

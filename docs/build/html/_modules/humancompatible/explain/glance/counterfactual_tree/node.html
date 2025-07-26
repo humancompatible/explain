@@ -1,0 +1,363 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>humancompatible.explain.glance.counterfactual_tree.node &mdash; HumanCompatible.Explain  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            HumanCompatible.Explain
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../facts.html">FACTS: Fairness Aware Counterfactual for Subgrouos package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../glance.html">GLANCE: Global Actions in a Nutshell for Counterfactual Explainability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../fcx.html">FCX: Finding Feasible Counterfactual Explanation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">HumanCompatible.Explain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">humancompatible.explain.glance.counterfactual_tree.node</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for humancompatible.explain.glance.counterfactual_tree.node</h1><div class="highlight"><pre>
+<div class="viewcode-block" id="Node">
+<a class="viewcode-back" href="../../../../../glance.counterfactual_tree.html#humancompatible.explain.glance.counterfactual_tree.node.Node">[docs]</a>
+<span></span><span class="k">class</span><span class="w"> </span><span class="nc">Node</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class representing a node in a decision tree structure.</span>
+
+<span class="sd">    Each node can have child nodes, actions associated with it, and metrics </span>
+<span class="sd">    such as effectiveness and cost. This class provides methods to add child </span>
+<span class="sd">    nodes, retrieve actions from leaf nodes, and visualize the tree structure.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    split_feature : str or None</span>
+<span class="sd">        The feature used to split the data at this node. Default is None.</span>
+<span class="sd">        </span>
+<span class="sd">    actions : list or None</span>
+<span class="sd">        A list of actions associated with this node. Default is None.</span>
+<span class="sd">        </span>
+<span class="sd">    effectiveness : float</span>
+<span class="sd">        The effectiveness of the actions taken at this node. Default is 0.</span>
+<span class="sd">        </span>
+<span class="sd">    cost : float</span>
+<span class="sd">        The total cost associated with the actions at this node. Default is 0.</span>
+<span class="sd">        </span>
+<span class="sd">    size : int</span>
+<span class="sd">        The number of instances or data points at this node. Default is 0.</span>
+<span class="sd">        </span>
+<span class="sd">    children : dict</span>
+<span class="sd">        A dictionary mapping from subgroup values to child nodes.</span>
+<span class="sd">        </span>
+<span class="sd">    Methods:</span>
+<span class="sd">    -------</span>
+<span class="sd">    add_child(subgroup, child_node):</span>
+<span class="sd">        Adds a child node to this node.</span>
+<span class="sd">    </span>
+<span class="sd">    return_leafs_actions():</span>
+<span class="sd">        Returns all actions from the leaf nodes in the subtree rooted at this node.</span>
+<span class="sd">        </span>
+<span class="sd">    to_igraph(numeric_features=[]):</span>
+<span class="sd">        Converts the tree structure to an igraph object for visualization.</span>
+<span class="sd">        </span>
+<span class="sd">    display_igraph_jupyter(numeric_features=[]):</span>
+<span class="sd">        Displays the tree structure in a Jupyter notebook using matplotlib and igraph.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">split_feature</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">actions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">effectiveness</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">size</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a new Node instance.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        ----------</span>
+<span class="sd">        split_feature : str or None</span>
+<span class="sd">            The feature used to split the data at this node. Default is None.</span>
+<span class="sd">            </span>
+<span class="sd">        actions : list or None</span>
+<span class="sd">            A list of actions associated with this node. Default is None.</span>
+<span class="sd">            </span>
+<span class="sd">        effectiveness : float</span>
+<span class="sd">            The effectiveness of the actions taken at this node. Default is 0.</span>
+<span class="sd">            </span>
+<span class="sd">        cost : float</span>
+<span class="sd">            The total cost associated with the actions at this node. Default is 0.</span>
+<span class="sd">            </span>
+<span class="sd">        size : int</span>
+<span class="sd">            The number of instances or data points at this node. Default is 0.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">split_feature</span> <span class="o">=</span> <span class="n">split_feature</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">effectiveness</span> <span class="o">=</span> <span class="n">effectiveness</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">=</span> <span class="n">cost</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actions</span> <span class="o">=</span> <span class="n">actions</span>
+
+<div class="viewcode-block" id="Node.add_child">
+<a class="viewcode-back" href="../../../../../glance.counterfactual_tree.html#humancompatible.explain.glance.counterfactual_tree.node.Node.add_child">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subgroup</span><span class="p">,</span> <span class="n">child_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a child node to this node.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        ----------</span>
+<span class="sd">        subgroup : any</span>
+<span class="sd">            The value associated with the child node.</span>
+<span class="sd">            </span>
+<span class="sd">        child_node : Node</span>
+<span class="sd">            The child node to be added.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">subgroup</span><span class="p">)]</span> <span class="o">=</span> <span class="n">child_node</span></div>
+
+
+<div class="viewcode-block" id="Node.return_leafs_actions">
+<a class="viewcode-back" href="../../../../../glance.counterfactual_tree.html#humancompatible.explain.glance.counterfactual_tree.node.Node.return_leafs_actions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">return_leafs_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns all actions from the leaf nodes in the subtree rooted at this node.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A flattened list of actions from the leaf nodes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cfs_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">find_leafs_actions</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span> <span class="o">==</span> <span class="p">{}:</span>
+                <span class="n">cfs_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">actions</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">child_node</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                    <span class="n">find_leafs_actions</span><span class="p">(</span><span class="n">child_node</span><span class="p">)</span>
+
+        <span class="n">find_leafs_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">action</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">cfs_list</span> <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span></div>
+
+
+    
+<div class="viewcode-block" id="Node.to_igraph">
+<a class="viewcode-back" href="../../../../../glance.counterfactual_tree.html#humancompatible.explain.glance.counterfactual_tree.node.Node.to_igraph">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_igraph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numeric_features</span><span class="o">=</span><span class="p">[]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts the tree structure to an igraph object for visualization.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        ----------</span>
+<span class="sd">        numeric_features : list</span>
+<span class="sd">            A list of numeric feature names used for processing node labels.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        -------</span>
+<span class="sd">        ig.Graph</span>
+<span class="sd">            An igraph object representing the tree structure.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">igraph</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ig</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">pre_order</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">timer</span><span class="p">,</span> <span class="n">reg</span><span class="p">):</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">timer</span>
+            <span class="n">reg</span><span class="p">[</span><span class="n">timer</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span>
+            <span class="n">timer</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">_value</span><span class="p">,</span> <span class="n">child_node</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">timer</span> <span class="o">=</span> <span class="n">pre_order</span><span class="p">(</span><span class="n">child_node</span><span class="p">,</span> <span class="n">timer</span><span class="o">=</span><span class="n">timer</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="n">reg</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">timer</span>
+
+        <span class="n">node_registry</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">n_nodes</span> <span class="o">=</span> <span class="n">pre_order</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">reg</span><span class="o">=</span><span class="n">node_registry</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">pre_order_2</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+            <span class="n">max_value</span> <span class="o">=</span> <span class="mi">0</span> 
+            <span class="k">for</span> <span class="n">value</span><span class="p">,</span> <span class="n">child_node</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">split_feature</span> <span class="ow">in</span> <span class="n">numeric_features</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_value</span><span class="p">:</span>  
+                        <span class="n">max_value</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                        <span class="n">max_list</span> <span class="o">=</span> <span class="n">child_node</span>
+            <span class="k">for</span> <span class="n">value</span><span class="p">,</span> <span class="n">child_node</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">split_feature</span> <span class="ow">in</span> <span class="n">numeric_features</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">child_node</span> <span class="o">!=</span> <span class="n">max_list</span><span class="p">:</span>
+                        <span class="n">val</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">value</span><span class="p">,</span> <span class="n">child_node</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">child_node</span><span class="o">.</span><span class="n">data_feat</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">split_feature</span>
+                <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">split_feature</span> <span class="ow">in</span> <span class="n">numeric_features</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">child_node</span> <span class="o">==</span> <span class="n">max_list</span><span class="p">:</span>
+                        <span class="n">child_node</span><span class="o">.</span><span class="n">data_val</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&gt; </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="k">else</span><span class="p">:</span>   
+                        <span class="n">child_node</span><span class="o">.</span><span class="n">data_val</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&lt;= </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">child_node</span><span class="o">.</span><span class="n">data_val</span> <span class="o">=</span> <span class="n">value</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">pre_order_2</span><span class="p">(</span><span class="n">child_node</span><span class="p">)</span>
+
+        <span class="n">pre_order_2</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_feat</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_val</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span>
+
+        <span class="n">graph</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        
+        <span class="k">def</span><span class="w"> </span><span class="nf">add_nodes</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">size</span>
+            <span class="n">num_flipped</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">effectiveness</span>
+            <span class="n">cost_sum</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">cost</span>
+            <span class="n">eff</span> <span class="o">=</span> <span class="n">num_flipped</span> <span class="o">/</span> <span class="n">size</span>
+            <span class="n">actions</span> <span class="o">=</span> <span class="p">[</span><span class="n">action</span><span class="p">[</span><span class="n">action</span> <span class="o">!=</span> <span class="s2">&quot;-&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">actions</span><span class="p">]</span>
+            <span class="n">actions_</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">:</span>
+                <span class="n">action_copy</span> <span class="o">=</span> <span class="n">action</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">action_copy</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">numeric_features</span><span class="p">:</span>
+                        <span class="n">action_copy</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+                <span class="n">actions_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">action_copy</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">num_flipped</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">cost</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cost</span> <span class="o">=</span> <span class="n">cost_sum</span> <span class="o">/</span> <span class="n">num_flipped</span>
+
+            <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">eff</span><span class="si">=:</span><span class="s2">.2%</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">cost</span><span class="si">=:</span><span class="s2">.2f</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">size</span><span class="si">=}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">actions_</span><span class="p">:</span>
+                <span class="n">label</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+            <span class="n">graph</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span>
+                <span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">_child_name</span><span class="p">,</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">add_nodes</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+
+        <span class="n">add_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">add_edges</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">_child_name</span><span class="p">,</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span>
+                    <span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">child</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">split_feature</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">child</span><span class="o">.</span><span class="n">data_val</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="n">add_edges</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+
+        <span class="n">add_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">graph</span></div>
+
+
+<div class="viewcode-block" id="Node.display_igraph_jupyter">
+<a class="viewcode-back" href="../../../../../glance.counterfactual_tree.html#humancompatible.explain.glance.counterfactual_tree.node.Node.display_igraph_jupyter">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">display_igraph_jupyter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numeric_features</span><span class="o">=</span><span class="p">[]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Displays the tree structure in a Jupyter notebook using matplotlib and igraph.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        ----------</span>
+<span class="sd">        numeric_features : list</span>
+<span class="sd">            A list of numeric feature names used for processing node labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">igraph</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ig</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_igraph</span><span class="p">(</span><span class="n">numeric_features</span><span class="o">=</span><span class="n">numeric_features</span><span class="p">)</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">set_figheight</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">set_figwidth</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span>
+        <span class="n">vertex_labels</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">vs</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span>
+        <span class="n">edge_labels</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">es</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span>
+        <span class="n">ig</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">g</span><span class="p">,</span>
+            <span class="n">target</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="s2">&quot;reingold_tilford&quot;</span><span class="p">,</span>
+            <span class="n">vertex_size</span><span class="o">=</span><span class="mi">55</span><span class="p">,</span>
+            <span class="c1"># vertex_frame_width=10.0,</span>
+            <span class="c1"># vertex_frame_color=&quot;white&quot;,</span>
+            <span class="n">vertex_label</span><span class="o">=</span><span class="n">vertex_labels</span><span class="p">,</span>
+            <span class="n">edge_label</span><span class="o">=</span><span class="n">edge_labels</span><span class="p">,</span>
+            <span class="n">vertex_label_size</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span></div>
+</div>
+
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, AutoFair Project.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

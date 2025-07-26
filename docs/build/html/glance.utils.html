@@ -1,0 +1,324 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>glance.utils package &mdash; HumanCompatible.Explain  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            HumanCompatible.Explain
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="facts.html">FACTS: Fairness Aware Counterfactual for Subgrouos package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glance.html">GLANCE: Global Actions in a Nutshell for Counterfactual Explainability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fcx.html">FCX: Finding Feasible Counterfactual Explanation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">HumanCompatible.Explain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">glance.utils package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/glance.utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="glance-utils-package">
+<h1>glance.utils package<a class="headerlink" href="#glance-utils-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="humancompatible-explain-glance-utils-action-module">
+<h2>humancompatible.explain.glance.utils.action module<a class="headerlink" href="#humancompatible-explain-glance-utils-action-module" title="Link to this heading"></a></h2>
+<dl class="py function" id="module-humancompatible.explain.glance.utils.action">
+<dt class="sig sig-object py" id="humancompatible.explain.glance.utils.action.actions_mean_pandas">
+<span class="sig-prename descclassname"><span class="pre">humancompatible.explain.glance.utils.action.</span></span><span class="sig-name descname"><span class="pre">actions_mean_pandas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numerical_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categorical_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categorical_no_action_token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="_modules/humancompatible/explain/glance/utils/action.html#actions_mean_pandas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.glance.utils.action.actions_mean_pandas" title="Link to this definition"></a></dt>
+<dd><p>Computes the mean action for numerical features and the most frequent action for categorical features from a given actions DataFrame.</p>
+<p>For numerical features, the function calculates the mean of the actions across all instances.
+For categorical features, it determines the most frequent value in the <cite>actions</cite> DataFrame, unless all values are equal to the <cite>categorical_no_action_token</cite>,
+in which case the token is returned.</p>
+<section id="parameters">
+<h3>Parameters:<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>actions<span class="classifier">pd.DataFrame</span></dt><dd><p>A DataFrame where each row represents an instance, and each column represents an action for a feature (either numerical or categorical).</p>
+</dd>
+<dt>numerical_features<span class="classifier">List[str]</span></dt><dd><p>List of columns in <cite>actions</cite> that are numerical features.</p>
+</dd>
+<dt>categorical_features<span class="classifier">List[str]</span></dt><dd><p>List of columns in <cite>actions</cite> that are categorical features.</p>
+</dd>
+<dt>categorical_no_action_token<span class="classifier">Any</span></dt><dd><p>A token or value that indicates no action is needed for categorical features.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns:<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>pd.Series</dt><dd><p>A Series where:
+- For numerical features, the values are the mean of the actions for each numerical column.
+- For categorical features, the values are the most frequent action in each categorical column, or the <cite>categorical_no_action_token</cite> if no action was needed.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="humancompatible.explain.glance.utils.action.apply_action_numpy">
+<span class="sig-prename descclassname"><span class="pre">humancompatible.explain.glance.utils.action.</span></span><span class="sig-name descname"><span class="pre">apply_action_numpy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">number</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">number</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numerical_columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categorical_columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categorical_no_action_token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">number</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">number</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/humancompatible/explain/glance/utils/action.html#apply_action_numpy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.glance.utils.action.apply_action_numpy" title="Link to this definition"></a></dt>
+<dd><p>Apply <cite>action</cite> to all rows of <cite>X</cite>. For numerical columns, add the
+respective component from <cite>action</cite>. For categorical columns, set the
+component of all rows to the value of <cite>action</cite>, unless it is equal to
+the <cite>categorical_no_action_token</cite>, in which case do nothing for this
+column.</p>
+<p>Note: input array should have a numeric dtype. Thus, categorical columns
+should be encoded by numbers (e.g. Ordinal Encoding).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>npt.NDArray</em><em>[</em><em>np.number</em><em>]</em>) – matrix of observations</p></li>
+<li><p><strong>action</strong> (<em>npt.NDArray</em><em>[</em><em>np.number</em><em>]</em>) – for each column / feature, the action to be applied</p></li>
+<li><p><strong>numerical_columns</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>) – numerical column indices</p></li>
+<li><p><strong>categorical_columns</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>) – categorical column indices</p></li>
+<li><p><strong>categorical_no_action_token</strong> (<em>np.number</em>) – special value signifying no-action (i.e. equivalent to 0 for numerical columns)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>new observations resulting from the action application.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>npt.NDArray[np.number]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="humancompatible.explain.glance.utils.action.apply_action_pandas">
+<span class="sig-prename descclassname"><span class="pre">humancompatible.explain.glance.utils.action.</span></span><span class="sig-name descname"><span class="pre">apply_action_pandas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numerical_columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categorical_columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categorical_no_action_token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numerical_no_action_token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/humancompatible/explain/glance/utils/action.html#apply_action_pandas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.glance.utils.action.apply_action_pandas" title="Link to this definition"></a></dt>
+<dd><p>Apply <cite>action</cite> to all rows of <cite>X</cite>. For numerical columns, add the
+respective component from <cite>action</cite>. For categorical columns, set the
+component of all rows to the value of <cite>action</cite>, unless it is equal to
+the <cite>categorical_no_action_token</cite>, in which case do nothing for this
+column.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>pd.DataFrame</em>) – matrix of observations</p></li>
+<li><p><strong>action</strong> (<em>pd.Series</em>) – for each column / feature, the action to be applied</p></li>
+<li><p><strong>numerical_columns</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – numerical column names</p></li>
+<li><p><strong>categorical_columns</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – categorical column names</p></li>
+<li><p><strong>categorical_no_action_token</strong> (<em>Any</em>) – special value signifying no-action (i.e. equivalent to 0 for numerical columns)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>new observations resulting from the action application.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="humancompatible.explain.glance.utils.action.apply_actions_pandas_rows">
+<span class="sig-prename descclassname"><span class="pre">humancompatible.explain.glance.utils.action.</span></span><span class="sig-name descname"><span class="pre">apply_actions_pandas_rows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numerical_columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categorical_columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categorical_no_action_token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/humancompatible/explain/glance/utils/action.html#apply_actions_pandas_rows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.glance.utils.action.apply_actions_pandas_rows" title="Link to this definition"></a></dt>
+<dd><p>Applies a set of actions to transform the original dataset <cite>X</cite> based on the actions specified in the <cite>actions</cite> DataFrame.</p>
+<p>For numerical columns, the function adds the values from the <cite>actions</cite> DataFrame to the corresponding columns in <cite>X</cite>.
+For categorical columns, if the action for a column is not equal to the <cite>categorical_no_action_token</cite>, the value from the <cite>actions</cite> DataFrame is used to update <cite>X</cite>.
+Otherwise, the original value from <cite>X</cite> is retained.</p>
+<section id="id1">
+<h3>Parameters:<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame</span></dt><dd><p>The original dataset, where each row represents an instance, and each column is a feature.</p>
+</dd>
+<dt>actions<span class="classifier">pd.DataFrame</span></dt><dd><p>A DataFrame of the same shape as <cite>X</cite>, containing the actions to apply to each feature.
+- For numerical columns: contains the values to add to the corresponding features in <cite>X</cite>.
+- For categorical columns: contains either the new value to apply or the <cite>categorical_no_action_token</cite>.</p>
+</dd>
+<dt>numerical_columns<span class="classifier">List[str]</span></dt><dd><p>List of columns in <cite>X</cite> and <cite>actions</cite> that are numerical.</p>
+</dd>
+<dt>categorical_columns<span class="classifier">List[str]</span></dt><dd><p>List of columns in <cite>X</cite> and <cite>actions</cite> that are categorical.</p>
+</dd>
+<dt>categorical_no_action_token<span class="classifier">object</span></dt><dd><p>A token or value indicating that no action should be taken for a categorical feature.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>Returns:<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>pd.DataFrame</dt><dd><p>A DataFrame of the same shape as <cite>X</cite> where the actions have been applied:
+- For numerical columns: each value is updated by adding the corresponding action from <cite>actions</cite>.
+- For categorical columns: updated values from <cite>actions</cite> are used where applicable; otherwise, the original values from <cite>X</cite> are retained.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="humancompatible.explain.glance.utils.action.extract_actions_pandas">
+<span class="sig-prename descclassname"><span class="pre">humancompatible.explain.glance.utils.action.</span></span><span class="sig-name descname"><span class="pre">extract_actions_pandas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categorical_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numerical_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categorical_no_action_token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/humancompatible/explain/glance/utils/action.html#extract_actions_pandas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.glance.utils.action.extract_actions_pandas" title="Link to this definition"></a></dt>
+<dd><p>Extracts the actions needed to convert the original dataset <cite>X</cite> into the counterfactual dataset <cite>cfs</cite>.</p>
+<p>For categorical features, the function identifies changes between <cite>X</cite> and <cite>cfs</cite>.
+If no change is observed in a categorical feature, a specified <cite>categorical_no_action_token</cite> is used to denote that no action is needed.
+For numerical features, the function computes the difference between the counterfactual and the original values.</p>
+<section id="id3">
+<h3>Parameters:<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame</span></dt><dd><p>The original dataset, where each row represents an instance, and each column is a feature.</p>
+</dd>
+<dt>cfs<span class="classifier">pd.DataFrame</span></dt><dd><p>The counterfactual dataset, which has the same structure as <cite>X</cite>. It represents the desired state after some action is applied.</p>
+</dd>
+<dt>categorical_features<span class="classifier">List[str]</span></dt><dd><p>List of columns in <cite>X</cite> and <cite>cfs</cite> that are categorical.</p>
+</dd>
+<dt>numerical_features<span class="classifier">List[str]</span></dt><dd><p>List of columns in <cite>X</cite> and <cite>cfs</cite> that are numerical.</p>
+</dd>
+<dt>categorical_no_action_token<span class="classifier">Any</span></dt><dd><p>A token or value to insert into categorical features where no change is needed (i.e., the feature value in <cite>X</cite> is the same as in <cite>cfs</cite>).</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>Returns:<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>pd.DataFrame</dt><dd><p>A DataFrame of the same shape as <cite>X</cite> and <cite>cfs</cite> where each value indicates the action required to transform <cite>X</cite> into <cite>cfs</cite>:
+- For categorical features: the value in <cite>cfs</cite> if it differs from <cite>X</cite>, otherwise <cite>categorical_no_action_token</cite>.
+- For numerical features: the difference between <cite>cfs</cite> and <cite>X</cite>.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+<section id="module-humancompatible.explain.glance.utils.centroid">
+<span id="glance-utils-centroid-module"></span><h2>glance.utils.centroid module<a class="headerlink" href="#module-humancompatible.explain.glance.utils.centroid" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="humancompatible.explain.glance.utils.centroid.centroid_numpy">
+<span class="sig-prename descclassname"><span class="pre">humancompatible.explain.glance.utils.centroid.</span></span><span class="sig-name descname"><span class="pre">centroid_numpy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">number</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numerical_columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categorical_columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">number</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/humancompatible/explain/glance/utils/centroid.html#centroid_numpy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.glance.utils.centroid.centroid_numpy" title="Link to this definition"></a></dt>
+<dd><p>Calculates the centroid of the rows of a 2d numy array. Specifically,
+for the <cite>numerical_columns</cite> columns, the centroid has value the mean of all
+rows, while for the <cite>categorical_columns</cite> columns, the centroid has value
+the mode of all rows.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>npt.NDArray</em><em>[</em><em>np.number</em><em>]</em>) – matrix of observations</p></li>
+<li><p><strong>numerical_columns</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>) – numerical column indices</p></li>
+<li><p><strong>categorical_columns</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>) – categorical column indices</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>2d numpy array whose single row is the centroid</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>npt.NDArray[np.number]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="humancompatible.explain.glance.utils.centroid.centroid_pandas">
+<span class="sig-prename descclassname"><span class="pre">humancompatible.explain.glance.utils.centroid.</span></span><span class="sig-name descname"><span class="pre">centroid_pandas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numerical_columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categorical_columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/humancompatible/explain/glance/utils/centroid.html#centroid_pandas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#humancompatible.explain.glance.utils.centroid.centroid_pandas" title="Link to this definition"></a></dt>
+<dd><p>Calculates the centroid of the rows of a pandas DataFrame. Specifically,
+for the <cite>numerical_columns</cite> columns, the centroid has value the mean of all
+rows, while for the <cite>categorical_columns</cite> columns, the centroid has value
+the mode of all rows.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>pd.DataFrame</em>) – matrix of observations</p></li>
+<li><p><strong>numerical_columns</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – numerical column names</p></li>
+<li><p><strong>categorical_columns</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – categorical column names</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame whose single row is the centroid</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="humancompatible-explain-glance-utils-metadata-requests-module">
+<h2>humancompatible.explain.glance.utils.metadata_requests module<a class="headerlink" href="#humancompatible-explain-glance-utils-metadata-requests-module" title="Link to this heading"></a></h2>
+</section>
+<section id="module-humancompatible.explain.glance.utils">
+<span id="module-contents"></span><span id="module-humancompatible.explain.glance.utils.metadata_requests"></span><h2>Module contents<a class="headerlink" href="#module-humancompatible.explain.glance.utils" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, AutoFair Project.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
