@@ -8,6 +8,8 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+sys.path.insert(0, os.path.abspath('../../humancompatible/explain/fcx/scripts'))
+sys.path.insert(0, os.path.abspath('../../humancompatible/explain/fcx'))
 
 project = 'HumanCompatible.Explain'
 copyright = '2025, AutoFair Project'
@@ -17,6 +19,7 @@ author = 'AutoFair Project'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.napoleon','sphinx.ext.viewcode']
+
 
 templates_path = ['_templates']
 exclude_patterns = []

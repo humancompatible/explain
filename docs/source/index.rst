@@ -13,7 +13,7 @@ Included Methods
 
 - **GLANCE**: A versatile and adaptive framework for generating global counterfactual explanations. These explanations are expressed as actions that offer recourse to large population subgroups. The framework aims to provide explanations and insights, ensuring that the actions benefit as many individuals as possible.
 - **FACTS**: An efficient, model-agnostic, highly parameterizable, and explainable framework for evaluating subgroup fairness through counterfactual explanations. FACTS facilitates in-depth analysis of fairness across different subgroups by simulating alternative decision outcomes.
-
+- **FCX**: Feasible Counterfactual Explanations (FCX) is a novel framework that generates realistic and low-cost counterfactuals by enforcing both hard feasibility constraints provided by domain experts and soft causal constraints inferred from data.
 Explore the documentation below for details on the implementation, usage, and customization of these methods.
 
 
@@ -24,3 +24,4 @@ Explore the documentation below for details on the implementation, usage, and cu
 
    facts
    glance
+   fcx
