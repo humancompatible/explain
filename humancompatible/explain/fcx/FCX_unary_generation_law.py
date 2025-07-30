@@ -26,9 +26,8 @@ from torch.autograd import Variable
 #Seed for repoduability
 torch.manual_seed(10000000)
 #GPU
-cuda= torch.device('cuda:0')
-
-def compute_loss( model, model_out, x, target_label, normalise_weights, validity_reg, margin,adj_matrix ): 
+cuda = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+def compute_loss( model, model_out, x, target_label, normalise_weights, validity_reg, margin,adj_matrix,pred_model ): 
     lambda_nc = 1
     lambda_c = 1
 
@@ -77,10 +76,13 @@ def compute_loss( model, model_out, x, target_label, normalise_weights, validity
         temp_encoded_categorical_feature_indexes = list(model.encoded_categorical_feature_indexes[0:1]) + model.encoded_categorical_feature_indexes[2:]
 
         for v in temp_encoded_categorical_feature_indexes:
-            temp +=0.5*torch.sum( torch.sum( torch.norm(x_pred[sample, v[0]:v[-1]+1]-x[sample, v[0]:v[-1]+1],p=1)>0.01) )#/x.shape[0]
+            #temp +=0.5*torch.sum( torch.sum( torch.norm(x_pred[sample, v[0]:v[-1]+1]-x[sample, v[0]:v[-1]+1],p=1)>0.01) )#/x.shape[0]
+            mask = (torch.norm(x_pred[sample, v[0]:v[-1]+1] - x[sample, v[0]:v[-1]+1],p=1) > 0.01).float()
+            temp += 0.5 * torch.sum(mask)
         
         for t in [0,1]:
-            temp +=0.5*torch.sum( torch.sum( torch.norm(x_pred[sample, t]-x[sample, t])) )
+            #temp +=0.5*torch.sum( torch.sum( torch.norm(x_pred[sample, t]-x[sample, t])) )
+            temp += 0.5 * torch.norm(x_pred[sample, t] - x[sample, t])
 
         sparsity += temp
 
@@ -117,10 +119,11 @@ def compute_loss( model, model_out, x, target_label, normalise_weights, validity
     validity_loss = -1*validity_reg*validity_loss/mc_samples
     reg_loss=reg_loss/mc_samples
     print('recon: ',-torch.mean(recon_err), ' KL: ', torch.mean(kl_divergence), ' Validity: ', -validity_loss, ' Reg: ', reg_loss, ' Sparsity: ', sparsity)
-    return -torch.mean(recon_err - kl_divergence) - validity_loss + reg_loss*1 + sparsity
+    loss = (-torch.mean(recon_err - kl_divergence) - validity_loss + reg_loss*1 + sparsity)
+    return loss.squeeze()
     
 
-def train_constraint_loss(model, train_dataset, optimizer, normalise_weights, validity_reg, constraint_reg, margin, epochs=1000, batch_size=1024,adj_matrix=None):
+def train_constraint_loss(model, train_dataset, optimizer, normalise_weights, validity_reg, constraint_reg, margin, epochs=1000, batch_size=1024,adj_matrix=None,pred_model=None):
     batch_num=0
     train_loss=0.0
     train_size=0
@@ -139,7 +142,7 @@ def train_constraint_loss(model, train_dataset, optimizer, normalise_weights, va
         out= model(train_x, train_y)
 
         train_x = torch.cat((train_x[:,:8],train_x_back[:,8:10],train_x[:,8:]),1)
-        loss = compute_loss(model, out, train_x, train_y, normalise_weights, validity_reg, margin,adj_matrix)           
+        loss = compute_loss(model, out, train_x, train_y, normalise_weights, validity_reg, margin,adj_matrix,pred_model)           
         
         dm = out['x_pred']
         mc_samples = out['mc_samples']
@@ -166,9 +169,9 @@ def train_constraint_loss(model, train_dataset, optimizer, normalise_weights, va
         constraint_loss= constraint_reg*constraint_loss
         lof_loss=1*temp_lof_loss
 
-        loss+=lof_loss*1
+        loss=loss+lof_loss*1
 
-        loss+= torch.mean(constraint_loss)
+        loss=loss+ torch.mean(constraint_loss)
         train_loss += loss.item()
         batch_num+=1
         loss.backward()
@@ -193,7 +196,7 @@ def train_unary_fcx_vae(
     global pred_model,cuda
     torch.manual_seed(10000000)
 
-    cuda = torch.device('cuda:0')
+    cuda = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
     # Dataset
     dataset = pd.read_csv(os.path.join(base_data_dir, 'law', 'bar_pass_prediction_v2.csv'))
@@ -289,7 +292,7 @@ def train_unary_fcx_vae(
             train_constraint_loss(
                 fcx_vae, vae_train_dataset, fcx_vae_optimizer,
                 normalise_weights, validity, feasibility, margin,
-                1, batch_size, adj_values
+                1, batch_size, adj_values,pred_model
             )
         )
         if ep == 0:

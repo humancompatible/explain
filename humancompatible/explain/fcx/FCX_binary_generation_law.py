@@ -25,8 +25,8 @@ from torchvision import datasets, transforms
 from torchvision.utils import save_image
 from torch.autograd import Variable
 
-
-def compute_loss( model, model_out, x, target_label, normalise_weights, validity_reg, margin, adj_matrix): 
+cuda = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+def compute_loss( model, model_out, x, target_label, normalise_weights, validity_reg, margin, adj_matrix,pred_model): 
     lambda_nc=1
     lambda_c=1
     em = model_out['em']
@@ -118,9 +118,10 @@ def compute_loss( model, model_out, x, target_label, normalise_weights, validity
 
     sparsity = 1*1*sparsity#/mc_samples
     print('recon: ',-torch.mean(recon_err), ' KL: ', torch.mean(kl_divergence), ' Validity: ', -validity_loss,'sparsity: ',sparsity, 'reg_loss: ', reg_loss)
-    return -torch.mean(recon_err - kl_divergence) - validity_loss + sparsity + reg_loss *10 #30
+    loss= (-torch.mean(recon_err - kl_divergence) - validity_loss + sparsity + reg_loss *10) #30
+    return loss.squeeze()
     
-def train_constraint_loss(model, train_dataset, optimizer, normalise_weights, validity_reg, constraint_reg, margin, epochs=1000, batch_size=1024,adj_matrix=None):
+def train_constraint_loss(model, train_dataset, optimizer, normalise_weights, validity_reg, constraint_reg, margin, epochs=1000, batch_size=1024,adj_matrix=None,ed_dict=None,pred_model=None):
     batch_num=0
     train_loss=0.0
     train_size=0
@@ -144,7 +145,7 @@ def train_constraint_loss(model, train_dataset, optimizer, normalise_weights, va
         train_x = torch.cat((train_x[:,:8],train_x_back[:,8:10],train_x[:,8:]),1)
 
 
-        loss = compute_loss(model, out, train_x, train_y, normalise_weights, validity_reg, margin,adj_matrix)           
+        loss = compute_loss(model, out, train_x, train_y, normalise_weights, validity_reg, margin,adj_matrix,pred_model)           
         
         dm = out['x_pred']
         mc_samples = out['mc_samples']
@@ -176,9 +177,9 @@ def train_constraint_loss(model, train_dataset, optimizer, normalise_weights, va
         
         constraint_loss= constraint_reg*constraint_loss
         lof_loss=1*temp_lof_loss
-        loss+=lof_loss*10
+        loss=loss+lof_loss*10
 
-        loss+= torch.mean(constraint_loss)
+        loss=loss+ torch.mean(constraint_loss)
         train_loss += loss.item()
         batch_num+=1
         
@@ -201,10 +202,10 @@ def train_binary_fcx_vae(
     margin: float = 0.5,
 ):
     # Seed and device
-    global pred_model,ed_dict,cuda
+    global cuda
     torch.manual_seed(10000000)
 
-    cuda = torch.device('cuda:0')
+    cuda = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
     # Encoded features and education mapping
     encoded_feature_names = [
@@ -310,7 +311,7 @@ def train_binary_fcx_vae(
         loss_val.append(train_constraint_loss(
             fcx_vae, vae_train_dataset, fcx_vae_optimizer,
             normalise_weights, validity, feasibility, margin,
-            1, batch_size, adj_tensor
+            1, batch_size, adj_tensor,ed_dict, pred_model
         ))
         end_time = time.time()
         epoch_time_list.append(end_time - start_time)

@@ -16,7 +16,9 @@ from helpers import load_adult_income_dataset
 from causal_modules import causal_regularization_enhanced, binarize_adj_matrix, ensure_dag
 from LOFLoss import LOFLoss
 
-def compute_loss( model, model_out, x, target_label, normalise_weights, validity_reg, margin,adj_matrix ): 
+cuda = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
+def compute_loss( model, model_out, x, target_label, normalise_weights, validity_reg, margin,adj_matrix,pred_model=None ): 
     """
     Compute the combined ELBO, validity hinge-loss, sparsity penalty,
     and causal regularization for a batch of examples.
@@ -143,10 +145,19 @@ def compute_loss( model, model_out, x, target_label, normalise_weights, validity
     sparsity = 1*1*sparsity
     
     print('recon: ',-torch.mean(recon_err), ' KL: ', torch.mean(kl_divergence), ' Validity: ', -validity_loss,'sparsity: ',sparsity,'reg_loss: ',reg_loss)
-    return -torch.mean(recon_err - kl_divergence) - validity_loss + sparsity +reg_loss*5 #20 #den kserw mhpws thelei meion
+    #return -torch.mean(recon_err - kl_divergence) - validity_loss + sparsity +reg_loss*5 #20 #den kserw mhpws thelei meion
+    loss = (
+        -torch.mean(recon_err - kl_divergence)
+        - validity_loss
+        + sparsity
+        + reg_loss * 5
+    )
+    # ensure it’s a 0‑d tensor, not a 1‑element vector
+    return loss.squeeze()
+    
 
 
-def train_constraint_loss(model, train_dataset, optimizer, normalise_weights, validity_reg, constraint_reg, margin, epochs=1000, batch_size=1024,adj_matrix=None,ed_dict=None):
+def train_constraint_loss(model, train_dataset, optimizer, normalise_weights, validity_reg, constraint_reg, margin, epochs=1000, batch_size=1024,adj_matrix=None,ed_dict=None,pred_model=None):
     """
     Perform one epoch of FCX‑VAE training under causal and LOF constraints.
 
@@ -200,7 +211,7 @@ def train_constraint_loss(model, train_dataset, optimizer, normalise_weights, va
         train_x_back[:,:-4] = train_x
         train_x= train_x_back
 
-        loss = compute_loss(model, out, train_x, train_y, normalise_weights, validity_reg, margin,adj_matrix)           
+        loss = compute_loss(model, out, train_x, train_y, normalise_weights, validity_reg, margin,adj_matrix,pred_model)           
 
         dm = out['x_pred']
         mc_samples = out['mc_samples']
@@ -229,14 +240,16 @@ def train_constraint_loss(model, train_dataset, optimizer, normalise_weights, va
         constraint_loss= constraint_reg*(constraint_loss)
 
         lof_loss=temp_lof_loss
-        loss+=lof_loss*80
+        loss=loss+lof_loss*80
 
-        loss+= torch.mean(constraint_loss)
+        loss=loss+ torch.mean(constraint_loss)
         train_loss += loss.item()
         batch_num+=1
-        
-        loss.backward()
-        optimizer.step()        
+        if loss.requires_grad:
+            loss.backward()
+            optimizer.step()
+        else:
+            pass
 
     ret= train_loss
     print('Train Avg Loss: ', ret, train_size)
@@ -285,7 +298,7 @@ def train_binary_fcx_vae(
     """
     constraint_reg=feasibility
     # Globals and reproducibility
-    global pred_model
+    #global pred_model
     torch.manual_seed(10000000)
     global cuda, ed_dict
     cuda = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -425,7 +438,7 @@ def train_binary_fcx_vae(
         np.random.shuffle(vae_train_dataset)
         start_time = time.time()
 
-        loss_val.append( train_constraint_loss( fcx_vae, vae_train_dataset, fcx_vae_optimizer, normalise_weights, validity, constraint_reg, margin, 1, batch_size,adj_values,ed_dict) )
+        loss_val.append( train_constraint_loss( fcx_vae, vae_train_dataset, fcx_vae_optimizer, normalise_weights, validity, constraint_reg, margin, 1, batch_size,adj_values,ed_dict,pred_model) )
         end_time = time.time()
         epoch_time_list.append(end_time-start_time)
 
