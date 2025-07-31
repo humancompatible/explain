@@ -6,3 +6,4 @@ glance
 
    glance
    facts
+   fcx
