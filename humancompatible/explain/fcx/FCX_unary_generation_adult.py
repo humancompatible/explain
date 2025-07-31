@@ -30,7 +30,7 @@ from torch.autograd import Variable
 #Seed for repoduability
 torch.manual_seed(10000000)
 #GPU
-cuda= torch.device('cuda:0')
+cuda = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 def compute_loss( model, model_out, x, target_label, normalise_weights, validity_reg, margin,adj_matrix,pred_model ): 
     """
@@ -375,7 +375,8 @@ def train_unary_fcx_vae(
     adj = adj.drop('race_White',axis=1)
 
     # Create a directed graph
-    G = nx.from_numpy_matrix(adj.values, create_using=nx.DiGraph())
+    #G = nx.from_numpy_matrix(adj.values, create_using=nx.DiGraph())
+    G = nx.from_numpy_array(adj.to_numpy(), create_using=nx.DiGraph())
 
     # Check for cycles
     try:
@@ -389,7 +390,9 @@ def train_unary_fcx_vae(
     #plt.show()
 
     # Create a directed graph
-    G = nx.from_numpy_matrix(adj.values, create_using=nx.DiGraph())
+    G = nx.from_numpy_array(adj.to_numpy(), create_using=nx.DiGraph())
+    #G = nx.from_numpy_matrix(adj.values, create_using=nx.DiGraph())
+
 
     # Detect cycles
     try:
@@ -403,7 +406,9 @@ def train_unary_fcx_vae(
     except nx.exception.NetworkXNoCycle:
         print("No cycles found.")
 
-    adj2 = nx.to_numpy_matrix(G).astype(int)
+    #adj2 = nx.to_numpy_matrix(G).astype(int)
+    adj2 = nx.to_numpy_array(G).astype(int)
+
     adj = pd.DataFrame(adj2, index=adj.columns, columns=adj.columns)
 
     adj_values = adj.values

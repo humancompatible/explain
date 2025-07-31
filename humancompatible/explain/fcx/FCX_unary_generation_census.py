@@ -29,7 +29,7 @@ from torchvision.utils import save_image
 from torch.autograd import Variable
 
 torch.manual_seed(10000000)
-cuda= torch.device('cuda:0')
+cuda = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 def compute_loss( model, model_out, x, target_label, normalise_weights, validity_reg, margin,adj_matrix,pred_model ): 
     lambda_nc=1
@@ -268,7 +268,8 @@ def train_unary_fcx_vae(
         if col in adj.columns:
             adj = adj.drop(col, axis=0).drop(col, axis=1)
 
-    G = nx.from_numpy_matrix(adj.values, create_using=nx.DiGraph)
+    #G = nx.from_numpy_matrix(adj.values, create_using=nx.DiGraph)
+    G = nx.from_numpy_array(adj.to_numpy(), create_using=nx.DiGraph())
     try:
         topo_order = nx.topological_sort(G)
         print("Topological Order:", list(topo_order))
@@ -283,7 +284,9 @@ def train_unary_fcx_vae(
     except nx.exception.NetworkXNoCycle:
         pass
 
-    adj2       = nx.to_numpy_matrix(G).astype(int)
+    #adj2       = nx.to_numpy_matrix(G).astype(int)
+    adj2 = nx.to_numpy_array(G).astype(int)
+
     adj_df     = pd.DataFrame(adj2, index=adj.columns, columns=adj.columns)
     adj_values = binarize_adj_matrix(adj_df.values, threshold=0.5)
     adj_values = ensure_dag(adj_values)

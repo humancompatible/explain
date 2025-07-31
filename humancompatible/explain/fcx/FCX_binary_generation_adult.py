@@ -362,7 +362,8 @@ def train_binary_fcx_vae(
     adj = adj.drop('race_White',axis=1)
 
     # Create a directed graph
-    G = nx.from_numpy_matrix(adj.values, create_using=nx.DiGraph())
+    #G = nx.from_numpy_matrix(adj.values, create_using=nx.DiGraph())
+    G = nx.from_numpy_array(adj.to_numpy(), create_using=nx.DiGraph())
 
     # Check for cycles
     try:
@@ -376,8 +377,8 @@ def train_binary_fcx_vae(
     #plt.show()
 
     # Create a directed graph
-    G = nx.from_numpy_matrix(adj.values, create_using=nx.DiGraph())
-
+    #G = nx.from_numpy_matrix(adj.values, create_using=nx.DiGraph())
+    G = nx.from_numpy_array(adj.to_numpy(), create_using=nx.DiGraph())
     # Detect cycles
     try:
         cycles = list(nx.find_cycle(G, orientation='original'))
@@ -391,7 +392,9 @@ def train_binary_fcx_vae(
         print("No cycles found.")
 
 
-    adj2 = nx.to_numpy_matrix(G).astype(int)
+    #adj2 = nx.to_numpy_matrix(G).astype(int)
+    adj2 = nx.to_numpy_array(G).astype(int)
+
     adj = pd.DataFrame(adj2, index=adj.columns, columns=adj.columns)
     adj_values = adj.values
     adj_values = binarize_adj_matrix(adj_values, threshold=0.5)

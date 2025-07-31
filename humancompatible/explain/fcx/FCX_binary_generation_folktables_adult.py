@@ -303,7 +303,8 @@ def train_binary_fcx_vae(
         if col in adj.columns:
             adj = adj.drop(col,axis=0).drop(col,axis=1)
 
-    G = nx.from_numpy_matrix(adj.values, create_using=nx.DiGraph)
+    #G = nx.from_numpy_matrix(adj.values, create_using=nx.DiGraph)
+    G = nx.from_numpy_array(adj.to_numpy(), create_using=nx.DiGraph())
     try:
         print("Topological Order:", list(nx.topological_sort(G)))
     except nx.NetworkXUnfeasible:
@@ -314,7 +315,8 @@ def train_binary_fcx_vae(
     except nx.exception.NetworkXNoCycle:
         pass
 
-    adj2 = nx.to_numpy_matrix(G).astype(int)
+    #adj2 = nx.to_numpy_matrix(G).astype(int)
+    adj2 = nx.to_numpy_array(G).astype(int)
     adj_df = pd.DataFrame(adj2, index=adj.columns, columns=adj.columns)
     adj_values = binarize_adj_matrix(adj_df.values, threshold=0.5)
     adj_values = ensure_dag(adj_values)

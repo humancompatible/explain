@@ -78,8 +78,10 @@ def ensure_dag(adj_matrix):
         np.ndarray:
             A modified adjacency matrix of the same shape, guaranteed to be acyclic (a DAG).
     """
-    G = nx.from_numpy_matrix(adj_matrix, create_using=nx.DiGraph())
-    
+    #G = nx.from_numpy_matrix(adj_matrix, create_using=nx.DiGraph())
+    # using the direct replacement
+    G = nx.from_numpy_array(adj_matrix, create_using=nx.DiGraph())
+
     try:
         cycle = nx.find_cycle(G, orientation='original')
         print("Cycle detected. Attempting to remove cycles.")
@@ -97,4 +99,4 @@ def ensure_dag(adj_matrix):
     except nx.NetworkXNoCycle:
         print("No cycles detected. Adjacency matrix is a DAG.")
     
-    return nx.to_numpy_matrix(G).astype(int)
+    return nx.to_numpy_array(G).astype(int) # nx.to_numpy_matrix(G).astype(int)

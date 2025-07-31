@@ -264,7 +264,8 @@ def train_binary_fcx_vae(
     if 'pass_bar' in adj.columns:
         adj = adj.drop('pass_bar', axis=0).drop('pass_bar', axis=1)
 
-    G = nx.from_numpy_matrix(adj.values, create_using=nx.DiGraph)
+    #G = nx.from_numpy_matrix(adj.values, create_using=nx.DiGraph)
+    G = nx.from_numpy_array(adj.to_numpy(), create_using=nx.DiGraph())
     try:
         topo_order = nx.topological_sort(G)
         print('Topological Order:', list(topo_order))
@@ -273,7 +274,8 @@ def train_binary_fcx_vae(
 
     #nx.draw(G, with_labels=True, arrows=True)
 
-    G = nx.from_numpy_matrix(adj.values, create_using=nx.DiGraph)
+    #G = nx.from_numpy_matrix(adj.values, create_using=nx.DiGraph)
+    G = nx.from_numpy_array(adj.to_numpy(), create_using=nx.DiGraph())
     try:
         cycles = list(nx.find_cycle(G, orientation='original'))
         print('Cycles found:', cycles)
@@ -284,7 +286,8 @@ def train_binary_fcx_vae(
     except nx.exception.NetworkXNoCycle:
         print('No cycles found.')
 
-    adj2       = nx.to_numpy_matrix(G).astype(int)
+    #adj2       = nx.to_numpy_matrix(G).astype(int)
+    adj2 = nx.to_numpy_array(G).astype(int)
     adj_df     = pd.DataFrame(adj2, index=adj.columns, columns=adj.columns)
     adj_values = binarize_adj_matrix(adj_df.values, threshold=0.5)
     adj_values = ensure_dag(adj_values)
