@@ -249,13 +249,10 @@ class LiCE:
 
         Returns:
         --------
-        tuple[bool, list[DataLike]]
-            A tuple containing:
-            - A boolean indicating whether an optimal solution was found (`True`)
-              or if the solver terminated early/infeasibly (`False`).
-            - A list of generated counterfactuals (DataLike objects). The list
-              might be empty if no counterfactuals are found or if the solver
-              terminates unexpectedly.
+        list[DataLike]
+            A list of generated counterfactuals (DataLike objects). The list
+            might be empty if no counterfactuals are found or if the solver
+            terminates unexpectedly.
 
         Raises:
         -------
