@@ -111,12 +111,12 @@ class DataHandler:
             If the length of `feature_names` does not match the number of features in `X`.
         """
         if isinstance(X, pd.DataFrame):
-            if feature_names is None:
-                feature_names = X.columns
             if target_name is not None:
                 print("Taking target values from the X matrix")
                 y = X[target_name]
                 X = X.drop(columns=target_name)
+            if feature_names is None:
+                feature_names = X.columns
             X = X.to_numpy()
 
         if y is not None:
