@@ -198,7 +198,7 @@ class LiCE:
         spn_variant: str = "lower",
         ce_relative_distance: float = np.inf,
         ce_max_distance: float = np.inf,
-    ) -> tuple[bool, list[DataLike]]:
+    ) -> list[DataLike]:
         """
         Generates one or more counterfactual explanations for a given factual instance.
 
