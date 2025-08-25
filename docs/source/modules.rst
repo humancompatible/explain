@@ -6,4 +6,5 @@ glance
 
    glance
    facts
+   lice
    fcx

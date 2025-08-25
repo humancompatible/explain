@@ -34,6 +34,16 @@ importlib_resources==6.5.2
 joblib==1.4.2
 kiwisolver==1.4.7
 matplotlib==3.9.4
+# special requirements for LiCE
+pyomo==6.9.2
+onnx==1.18.0
+omlt==1.2.2
+gurobipy==12.0.3
+hihgspy==1.10.0
+mpmath==1.3.0
+statsmodels==0.14.5
+# special installation for SPFlow
+setup @ git+https://github.com/SPFlow/SPFlow@d01f71d6618e95267609c1899d8e8e95d64965e5
 networkx==3.4.2
 torchvision==0.16.1
 torchaudio==2.1.1
