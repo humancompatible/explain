@@ -1,4 +1,4 @@
-FACTS: Fairness Aware Counterfactual for Subgrouos package
+FACTS: Fairness Aware Counterfactual for Subgroups package
 =============
 
 .. contents::
